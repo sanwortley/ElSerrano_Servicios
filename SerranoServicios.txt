@@ -1,0 +1,17 @@
+1) Geolocalización, pero con con posibilidad de modificar manualmente. RUTA RECOMENDADA, PERO LO HACE EL ADMIN O SECRETARIO. 
+
+2) Por default, arme una hoja de ruta, en los servicios instantáneos. Hacen laburos por dia, dependiendo la zona. ZONA CALAMUCHITA. NO PERMITIR ZONAS QUE NO ESTEN EN CALAMUCHITA
+
+3) Contador de horas al loguear el chofer. PARA CORROBORAR HORAS.
+
+4) Agregar en servicio frecuente cuando ingresa dirección, dia saliente del camion, eso también hay que definirlo.
+
+5) Configuración o carga de datos
+
+6) Unificar servicios frecuentes y servicios instantáneos o de poco tiempo
+
+7) en el inicio, sumar en cantidad de pedidos activos, desglosando que servicios hay.
+
+8) averiguar api localización google maps
+
+9) balances que sean graficos, pedidos frecuentes, individuales, de manera semanal, pero que se arme por dia, mensual. Y otro grafico de ingresos por dia, asi ven. Otro grafico de las horas de los choferes. VER SI PUEDO SUMAR GASTOS ASI APARECEN EN EL GRAFICO. 
