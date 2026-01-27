@@ -79,6 +79,8 @@ async def get_driver_today(
     zona_hoy = ruta.zona if ruta else None
     zona_id_val = zona_hoy.id if zona_hoy else -1
     
+    print(f"DEBUG HOY: User {current_user.nombre}, Profile ID {current_user.chofer_perfil.id}")
+    
     # Individuales: Asignados, relevant states (including completed for today's view)
     stmt_ped = select(PedidoIndividual)\
         .where(
@@ -98,6 +100,7 @@ async def get_driver_today(
         )
         
     pedidos = (await db.execute(stmt_ped)).scalars().all()
+    print(f"DEBUG HOY: Found {len(pedidos)} individual pedidos for chofer {current_user.chofer_perfil.id}")
     
     # 3. Get Frecuentes
     # Activo, assigned, day matches
@@ -113,6 +116,7 @@ async def get_driver_today(
         )
         
     all_frec = (await db.execute(stmt_freq)).scalars().all()
+    print(f"DEBUG HOY: Found {len(all_frec)} frequent services for chofer {current_user.chofer_perfil.id}")
     
     # Filter by day overlap in Python
     # now we use strings "Lunes", etc. but dia_semana is 0-6
@@ -121,9 +125,21 @@ async def get_driver_today(
     frecuentes_hoy = [f for f in all_frec if hoy_str in f.dias_semana]
     
     # 4. Sort
-    # Combine list? Response separates them. I'll sort them individually.
-    sorted_pedidos = sort_by_nearest_neighbor(list(pedidos))
-    sorted_frecuentes = sort_by_nearest_neighbor(list(frecuentes_hoy))
+    # We prioritize manual order if 'orden_en_ruta' is not None. 
+    # If not set, we use the optimizer.
+    
+    def intelligent_sort(items):
+        manual = [i for i in items if i.orden_en_ruta is not None]
+        automatic = [i for i in items if i.orden_en_ruta is None]
+        manual.sort(key=lambda x: x.orden_en_ruta)
+        # We assume manual route starts at 1. If there's automatic stuff, we append it via nearest neighbor starting from last manual or depot.
+        # For simplicity, just concat manual + optimized automatic.
+        return manual + sort_by_nearest_neighbor(automatic)
+
+    sorted_pedidos = intelligent_sort(list(pedidos))
+    sorted_frecuentes = intelligent_sort(list(frecuentes_hoy))
+    
+    print(f"DEBUG: Chofer {current_user.nombre} (ID {current_user.chofer_perfil.id}) -> Pedidos: {len(pedidos)}, Frecuentes: {len(frecuentes_hoy)}")
     
     return DriverTodayResponse(
         fecha=today.strftime("%Y-%m-%d"),

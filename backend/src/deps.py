@@ -36,6 +36,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: An
     
     if user is None:
         raise credentials_exception
+    print(f"DEBUG AUTH: User {user.nombre} ({user.email}) logged in. Chofer Profile: {'Yes' if user.chofer_perfil else 'No'}")
     return user
 
 async def get_current_active_user(current_user: Annotated[Usuario, Depends(get_current_user)]):

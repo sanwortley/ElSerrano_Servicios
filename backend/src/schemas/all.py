@@ -108,12 +108,15 @@ class ClienteRead(ClienteBase):
 class PedidoBase(BaseModel):
     model_config = ConfigDict(from_attributes=True, kw_only=True)
     cliente_id: int
-    tipo_servicio: TipoServicio
+    tipo_servicio: str
     direccion: str
     costo: float
     descripcion: Optional[str] = None
     zona_id: Optional[int] = None
     fecha_hora_ejecucion: Optional[datetime] = None
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    orden_en_ruta: Optional[int] = None
 
     @field_validator('fecha_hora_ejecucion', mode='after')
     @classmethod
@@ -153,6 +156,9 @@ class FrecuenteBase(BaseModel):
     dia_saliente: Optional[str] = None
     fecha_fin: Optional[datetime] = None
     costo_individual: float = 0.0
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    orden_en_ruta: Optional[int] = None
 
     @field_validator('fecha_inicio', 'fecha_fin', mode='after')
     @classmethod

@@ -87,6 +87,18 @@ async def delete_cliente(
     if not cliente:
         raise HTTPException(status_code=404, detail="Cliente not found")
     
-    await db.delete(cliente)
-    await db.commit()
+    try:
+        await db.delete(cliente)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        err_msg = str(e).lower()
+        # Handle English and Spanish foreign key violation messages
+        if "foreign key" in err_msg or "llave foránea" in err_msg or "foreignkeyviolation" in err_msg:
+            raise HTTPException(
+                status_code=400, 
+                detail="No se puede eliminar el cliente porque tiene pedidos o abonos asociados. Se recomienda mantenerlo para no perder el historial de servicios."
+            )
+        raise HTTPException(status_code=500, detail=f"Error al eliminar: {str(e)}")
+        
     return {"ok": True}

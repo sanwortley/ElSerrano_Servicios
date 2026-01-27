@@ -26,7 +26,12 @@ async def create_pedido(
     check_staff_or_admin(current_user)
     
     # Geocoding & Zoning Hook
-    lat, lng = await get_lat_lng(pedido.direccion, db)
+    lat = pedido.lat
+    lng = pedido.lng
+    
+    if lat is None or lng is None:
+        lat, lng = await get_lat_lng(pedido.direccion, db)
+        
     zona_id = pedido.zona_id
     if not zona_id and lat and lng:
         zona_id = await find_zone_for_point(lat, lng, db)
@@ -41,7 +46,8 @@ async def create_pedido(
         descripcion=pedido.descripcion,
         costo=pedido.costo,
         fecha_hora_ejecucion=pedido.fecha_hora_ejecucion.replace(tzinfo=None) if pedido.fecha_hora_ejecucion else None,
-        recepcionista_id=current_user.id
+        recepcionista_id=current_user.id,
+        orden_en_ruta=pedido.orden_en_ruta
     )
     
     db.add(new_pedido)
@@ -123,8 +129,15 @@ async def update_pedido(
     if not db_pedido:
         raise HTTPException(status_code=404, detail="Pedido not found")
 
-    # Geocode Hook if address changes
-    if pedido_upd.direccion != db_pedido.direccion:
+    # Geocode Hook if address changes or it was never set
+    if pedido_upd.lat is not None and pedido_upd.lng is not None:
+        db_pedido.lat = pedido_upd.lat
+        db_pedido.lng = pedido_upd.lng
+        if not pedido_upd.zona_id:
+            db_pedido.zona_id = await find_zone_for_point(db_pedido.lat, db_pedido.lng, db)
+        else:
+            db_pedido.zona_id = pedido_upd.zona_id
+    elif pedido_upd.direccion != db_pedido.direccion:
         lat, lng = await get_lat_lng(pedido_upd.direccion, db)
         zona_id = None
         if lat and lng:
@@ -139,6 +152,7 @@ async def update_pedido(
     db_pedido.descripcion = pedido_upd.descripcion
     db_pedido.costo = pedido_upd.costo
     db_pedido.fecha_hora_ejecucion = pedido_upd.fecha_hora_ejecucion.replace(tzinfo=None) if pedido_upd.fecha_hora_ejecucion else None
+    db_pedido.orden_en_ruta = pedido_upd.orden_en_ruta
     
     await db.commit()
     await db.refresh(db_pedido)

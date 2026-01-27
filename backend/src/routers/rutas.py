@@ -6,7 +6,8 @@ from sqlalchemy.orm import selectinload
 from src.db import get_db
 from src.models.geo import RutaDia
 from src.schemas.all import RutaDiaRead, RutaDiaCreate
-from src.deps import get_admin_user
+from src.deps import get_admin_user, get_current_active_user
+from src.models.users import Chofer
 
 router = APIRouter(prefix="/rutas", tags=["Rutas"])
 
@@ -91,5 +92,29 @@ async def delete_ruta(
         raise HTTPException(status_code=404, detail="Ruta not found")
         
     await db.delete(db_ruta)
+    await db.commit()
+    return {"ok": True}
+@router.post("/reordenar")
+async def reorder_route(
+    data: List[dict], # List of { "id": int, "tipo": "P"|"F", "orden": int }
+    db: Annotated[AsyncSession, Depends(get_db)],
+    admin=Depends(get_current_active_user)
+):
+    from src.models.business import PedidoIndividual, ServicioFrecuente
+    
+    for item in data:
+        if item["tipo"] == "P":
+            stmt = select(PedidoIndividual).where(PedidoIndividual.id == item["id"])
+            res = await db.execute(stmt)
+            obj = res.scalar_one_or_none()
+            if obj:
+                obj.orden_en_ruta = item["orden"]
+        elif item["tipo"] == "F":
+            stmt = select(ServicioFrecuente).where(ServicioFrecuente.id == item["id"])
+            res = await db.execute(stmt)
+            obj = res.scalar_one_or_none()
+            if obj:
+                obj.orden_en_ruta = item["orden"]
+    
     await db.commit()
     return {"ok": True}

@@ -1,0 +1,70 @@
+# ESPECIFICACIONES TÉCNICAS Y FUNCIONALES - EL SERRANO SERVICIOS
+# Documento para Dirección y Gerencia
+
+Este documento detalla la estructura tecnológica del sistema, explica sus funcionalidades en lenguaje de negocio y propone mejoras estratégicas para el futuro.
+
+--------------------------------------------------------------------------------
+1. TECNOLOGÍAS UTILIZADAS (El Motor del Sistema)
+--------------------------------------------------------------------------------
+
+El sistema está construido con tecnologías modernas, seguras y escalables, similares a las que usan grandes empresas de logística hoy en día.
+
+**A. El Cerebro (Backend):**
+- **Lenguaje:** Python (Versión 3.11+). Es el lenguaje líder mundial para procesamiento de datos e inteligencia artificial.
+- **Framework:** FastAPI. Permite que el sistema sea extremadamente rápido y soporte muchas conexiones simultáneas.
+- **Base de Datos:** PostgreSQL. Una "caja fuerte" para los datos. Es robusta, no pierde información y permite realizar consultas complejas para reportes.
+
+**B. La Cara Visible (Frontend):**
+- **Tecnología:** React + Vite. Tecnología creada por Facebook, permite que la página web se sienta como una aplicación de escritorio (rápida, sin recargas constantes).
+- **Gráficos:** Recharts. Para visualizar la facturación y métricas de forma clara.
+
+--------------------------------------------------------------------------------
+2. MÓDULOS DEL SISTEMA (¿Qué hace cada parte?)
+--------------------------------------------------------------------------------
+
+Aquí explicamos qué problema resuelve cada sección del software para la empresa:
+
+A. **Módulo de Zonas y Mapas Inteligentes**
+   - *¿Qué hace?* Permite dibujar sobre un mapa real las zonas de trabajo (ej. "Zona Centro", "Zona Norte").
+   - *Valor para el negocio:* El sistema "sabe" dónde está cada cliente. Cuando entra un pedido, automáticamente asigna la zona correcta, evitando errores humanos y facilitando la logística.
+
+B. **Gestión de Clientes y Obras**
+   - *¿Qué hace?* Una base de datos centralizada de todos los clientes y sus ubicaciones.
+   - *Valor para el negocio:* Adiós a las notas en papel o Excel desactualizados. Si un cliente llama, ya sabemos quién es, dónde están sus obras y su historial.
+
+C. **Gestión de Pedidos de Volquetes**
+   - *¿Qué hace?* Controla el ciclo de vida completo de un alquiler: Entrega -> Retiro -> Finalización.
+   - *Valor para el negocio:* Control total del stock de volquetes. Sabemos cuántos están en la calle, cuántos en el patio y cuáles hay que ir a buscar hoy obligatoriamente.
+
+D. **Servicios Frecuentes (Baños Químicos)**
+   - *¿Qué hace?* Maneja servicios que se repiten (limpieza de baños lunes, miércoles y viernes).
+   - *Valor para el negocio:* Automatización. El sistema genera solo las hojas de ruta diarias sin que nadie tenga que acordarse de qué día le toca a quién.
+
+E. **Hoja de Ruta Digital (App de Choferes)**
+   - *¿Qué hace?* Genera la lista de tareas optimizada para cada camión/chofer.
+   - *Valor para el negocio:* Optimización de combustible y tiempo. El chofer ve en su celular a dónde ir, marca cuando llega y completa el servicio en tiempo real.
+
+F. **Tablero de Control (Dashboard Financiero)**
+   - *¿Qué hace?* Muestra ingresos, egresos y métricas clave en tiempo real.
+   - *Valor para el negocio:* Toma de decisiones basada en datos reales, no en intuición. Permite ver la rentabilidad del negocio al instante.
+
+--------------------------------------------------------------------------------
+3. PROPUESTA DE FUTURO (Próximos Pasos)
+--------------------------------------------------------------------------------
+
+Para llevar "El Serrano Servicios" al siguiente nivel, recomendamos implementar:
+
+1. **Notificaciones Automáticas por WhatsApp**
+   - Cuando el camión está saliendo, el cliente recibe un mensaje automático: "Su volquete está en camino". Reduce la ansiedad del cliente y las llamadas a la oficina.
+
+2. **Facturación Electrónica Automática (Integración AFIP)**
+   - Que el sistema emita la factura "A" o "B" automáticamente al cerrar el pedido, ahorrando horas de trabajo administrativo y contable.
+
+3. **Inteligencia Artificial para Predicción de Demanda**
+   - Analizar los datos históricos para predecir qué zonas pedirán más volquetes la próxima semana, permitiendo preparar la flota y el personal con anticipación.
+
+4. **Seguimiento GPS en Tiempo Real**
+   - Integrar los GPS de los camiones al mapa del sistema para ver en vivo dónde está cada unidad y recalcular rutas si hay mucho tráfico o imprevistos.
+
+--------------------------------------------------------------------------------
+Generado el: 26 de Enero de 2026

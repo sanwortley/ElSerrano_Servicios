@@ -63,9 +63,13 @@ async def create_frecuente(
 ):
     check_staff(current_user)
     
-    lat, lng = await get_lat_lng(frecuente.direccion, db)
-    zona_id = None
-    if lat and lng:
+    lat = frecuente.lat
+    lng = frecuente.lng
+    if lat is None or lng is None:
+        lat, lng = await get_lat_lng(frecuente.direccion, db)
+        
+    zona_id = frecuente.zona_id
+    if not zona_id and lat and lng:
         zona_id = await find_zone_for_point(lat, lng, db)
         
     # server side calc total? 
@@ -92,6 +96,7 @@ async def create_frecuente(
         fecha_inicio=f_inicio,
         fecha_fin=f_fin,
         dias_semana=frecuente.dias_semana,
+        orden_en_ruta=frecuente.orden_en_ruta
     )
     db.add(new_freq)
     try:
@@ -140,7 +145,14 @@ async def update_frecuente(
     if not db_freq:
         raise HTTPException(status_code=404, detail="Service not found")
         
-    if frec_upd.direccion != db_freq.direccion:
+    if frec_upd.lat is not None and frec_upd.lng is not None:
+         db_freq.lat = frec_upd.lat
+         db_freq.lng = frec_upd.lng
+         if not frec_upd.zona_id:
+             db_freq.zona_id = await find_zone_for_point(db_freq.lat, db_freq.lng, db)
+         else:
+             db_freq.zona_id = frec_upd.zona_id
+    elif frec_upd.direccion != db_freq.direccion:
          lat, lng = await get_lat_lng(frec_upd.direccion, db)
          zona_id = None
          if lat and lng:
@@ -159,6 +171,8 @@ async def update_frecuente(
     db_freq.fecha_inicio = frec_upd.fecha_inicio.replace(tzinfo=None) if frec_upd.fecha_inicio else None
     db_freq.fecha_fin = frec_upd.fecha_fin.replace(tzinfo=None) if frec_upd.fecha_fin else None
     db_freq.dias_semana = frec_upd.dias_semana
+    db_freq.dia_saliente = frec_upd.dia_saliente
+    db_freq.orden_en_ruta = frec_upd.orden_en_ruta
     
     await db.commit()
     await db.refresh(db_freq)

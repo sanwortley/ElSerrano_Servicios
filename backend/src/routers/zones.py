@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -13,12 +13,18 @@ router = APIRouter(prefix="/zonas", tags=["Zonas"])
 
 @router.get("/detect")
 async def detect_zone(
-    direccion: str,
-    db: Annotated[AsyncSession, Depends(get_db)]
+    db: Annotated[AsyncSession, Depends(get_db)],
+    direccion: Optional[str] = None,
+    lat: Optional[float] = None,
+    lng: Optional[float] = None
 ):
-    lat, lng = await get_lat_lng(direccion, db)
+    if lat is None or lng is None:
+        if not direccion:
+            return {"zona": None, "msg": "Dirección o coordenadas requeridas"}
+        lat, lng = await get_lat_lng(direccion, db)
+        
     if not (lat and lng):
-        return {"zona": None, "msg": "Dirección no encontrada"}
+        return {"zona": None, "msg": "Ubicación no encontrada", "lat": lat, "lng": lng}
     
     zona_id = await find_zone_for_point(lat, lng, db)
     if not zona_id:
@@ -27,7 +33,7 @@ async def detect_zone(
     stmt = select(Zona).where(Zona.id == zona_id)
     result = await db.execute(stmt)
     zona = result.scalar_one()
-    return {"zona": zona}
+    return {"zona": zona, "lat": lat, "lng": lng}
 
 @router.post("/", response_model=ZonaRead)
 async def create_zona(

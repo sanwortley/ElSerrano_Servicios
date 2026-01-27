@@ -27,7 +27,8 @@ async def get_lat_lng(address: str, db: AsyncSession):
         try:
             url = "https://nominatim.openstreetmap.org/search"
             headers = {"User-Agent": settings.NOMINATIM_USER_AGENT}
-            params = {"q": address, "format": "json", "limit": 1}
+            full_query = f"{address}, Calamuchita, Córdoba, Argentina"
+            params = {"q": full_query, "format": "json", "limit": 1}
             response = await client.get(url, params=params, headers=headers)
             data = response.json()
             
