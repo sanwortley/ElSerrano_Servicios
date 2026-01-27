@@ -36,3 +36,8 @@ fix_*.py
 check_*.py
 check_peds.py
 test_*.py
+
+# Large files
+*.zip
+*.mp4
+el_serranoServicios/
