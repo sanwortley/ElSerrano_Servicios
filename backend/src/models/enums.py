@@ -22,6 +22,7 @@ class EstadoPedido(str, Enum):
     COMPLETADA = "COMPLETADA"
     CANCELADA = "CANCELADA"
     FINALIZADO = "FINALIZADO"
+    CARGA_TARDIA = "CARGA_TARDIA"
 
 class EstadoFrecuente(str, Enum):
     ACTIVO = "ACTIVO"
@@ -33,3 +34,5 @@ class MetodoPago(str, Enum):
     EFECTIVO = "EFECTIVO"
     TRANSFERENCIA = "TRANSFERENCIA"
     CHEQUE = "CHEQUE"
+    TARJETA = "TARJETA"
+    MERCADO_PAGO = "MERCADO_PAGO"

@@ -1,0 +1,4 @@
+Starting fix...
+Connected to DB
+FAILED: 'coroutine' object has no attribute 'execute'
+Error type: <class 'AttributeError'>

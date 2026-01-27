@@ -92,8 +92,82 @@ async def get_pagos_recientes(
         "metodo": p.metodo_pago,
         "cliente": (p.pedido.cliente.nombre if p.pedido else (p.frecuente.cliente.nombre if p.frecuente else "Externo")),
         "servicio": ("Individual" if p.pedido else "Frecuente"),
+        "estado_pedido": p.pedido.estado if p.pedido else None,
         "registrado_por": p.registrador.nombre if p.registrador else "Sistema"
     } for p in pagos]
+
+@router.patch("/pagos/{pago_id}")
+async def update_pago(
+    pago_id: int,
+    data: dict, # simple dict for updates
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[Usuario, Depends(get_current_active_user)]
+):
+    if current_user.rol != Rol.ADMIN:
+        raise HTTPException(status_code=403, detail="Only admin can modify payments")
+    
+    stmt = select(Pago).where(Pago.id == pago_id)
+    result = await db.execute(stmt)
+    p = result.scalar_one_or_none()
+    if not p:
+        raise HTTPException(status_code=404, detail="Pago not found")
+        
+    if "monto" in data:
+        p.monto = float(data["monto"])
+    if "metodo_pago" in data:
+        p.metodo_pago = data["metodo_pago"]
+        
+    await db.commit()
+    return {"ok": True}
+
+@router.delete("/pagos/{pago_id}")
+async def delete_pago(
+    pago_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[Usuario, Depends(get_current_active_user)]
+):
+    if current_user.rol != Rol.ADMIN:
+        raise HTTPException(status_code=403, detail="Only admin can delete payments")
+        
+    stmt = select(Pago).where(Pago.id == pago_id)
+    result = await db.execute(stmt)
+    p = result.scalar_one_or_none()
+    if not p:
+        raise HTTPException(status_code=404, detail="Pago not found")
+        
+    await db.delete(p)
+    await db.commit()
+    return {"ok": True}
+
+@router.get("/gastos")
+async def get_gastos_recientes(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[Usuario, Depends(get_current_active_user)],
+    limit: int = 50
+):
+    if current_user.rol not in [Rol.ADMIN, Rol.RECEPCIONISTA]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    from src.models.business import Gasto
+    from src.models.users import Chofer, Usuario
+    
+    stmt = select(Gasto).order_by(Gasto.fecha.desc()).limit(limit).options(
+        selectinload(Gasto.chofer).selectinload(Chofer.usuario),
+        selectinload(Gasto.registrador)
+    )
+    result = await db.execute(stmt)
+    gastos = result.scalars().all()
+    
+    return [{
+        "id": g.id,
+        "fecha": g.fecha,
+        "monto": g.monto,
+        "categoria": g.categoria,
+        "descripcion": g.descripcion,
+        "chofer": g.chofer.usuario.nombre if g.chofer else "Admin",
+        "registrado_por": g.registrador.nombre
+    } for g in gastos]
+
 from datetime import timedelta
 
 @router.get("/charts/daily")

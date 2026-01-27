@@ -126,7 +126,7 @@ class PedidoBase(BaseModel):
         return v
 
 class PedidoCreate(PedidoBase):
-    pass
+    metodo_pago: Optional[MetodoPago] = None
 
 class PedidoRead(PedidoBase):
     id: int

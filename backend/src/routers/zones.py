@@ -7,7 +7,10 @@ from src.models.geo import Zona
 from src.schemas.all import ZonaRead, ZonaCreate
 from src.deps import get_admin_user
 
-from src.utils.geo import get_lat_lng, find_zone_for_point
+from src.utils.geo import get_lat_lng, find_zone_for_point, get_locality_boundary, search_addresses
+from shapely.geometry import shape, mapping
+from shapely.ops import unary_union
+import json
 
 router = APIRouter(prefix="/zonas", tags=["Zonas"])
 
@@ -116,3 +119,48 @@ async def desactivar_zona(
     await db.commit()
     await db.refresh(zona)
     return zona
+
+@router.get("/search-locality")
+async def search_locality(
+    q: str,
+    admin=Depends(get_admin_user)
+):
+    result = await get_locality_boundary(q)
+    if not result or not result.get("geojson"):
+         raise HTTPException(status_code=404, detail="No se encontró el límite de la localidad o no tiene un polígono definido")
+    return result
+
+@router.post("/merge")
+async def merge_geometries(
+    geometries: List[str], # List of GeoJSON strings
+    admin=Depends(get_admin_user)
+):
+    try:
+        shapes = [shape(json.loads(g)) for g in geometries]
+        merged = unary_union(shapes)
+        return json.dumps(mapping(merged))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error al unir geometrías: {str(e)}")
+
+@router.get("/suggest-address")
+async def suggest_address(
+    q: str,
+    admin=Depends(get_admin_user)
+):
+    return await search_addresses(q)
+
+@router.delete("/{zona_id}")
+async def delete_zona(
+    zona_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    admin=Depends(get_admin_user)
+):
+    stmt = select(Zona).where(Zona.id == zona_id)
+    result = await db.execute(stmt)
+    zona = result.scalar_one_or_none()
+    if not zona:
+        raise HTTPException(status_code=404, detail="Zona not found")
+        
+    await db.delete(zona)
+    await db.commit()
+    return {"ok": True}

@@ -74,3 +74,67 @@ async def find_zone_for_point(lat: float, lng: float, db: AsyncSession):
             continue
             
     return None
+
+async def get_locality_boundary(locality_name: str):
+    """
+    Fetches the GeoJSON boundary for a locality from Nominatim.
+    """
+    async with httpx.AsyncClient() as client:
+        try:
+            url = "https://nominatim.openstreetmap.org/search"
+            headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
+            # Search filter for Córdoba, Argentina to be more precise
+            full_query = f"{locality_name}, Córdoba, Argentina"
+            params = {
+                "q": full_query,
+                "format": "json",
+                "polygon_geojson": 1,
+                "limit": 1
+            }
+            response = await client.get(url, params=params, headers=headers)
+            data = response.json()
+            
+            if data and len(data) > 0:
+                return {
+                    "display_name": data[0]["display_name"],
+                    "geojson": data[0].get("geojson")
+                }
+        except Exception as e:
+            print(f"Error fetching boundary for {locality_name}: {e}")
+            return None
+            
+    return None
+
+async def search_addresses(query: str):
+    """
+    Returns multiple address candidates for a given query.
+    """
+    async with httpx.AsyncClient() as client:
+        try:
+            url = "https://nominatim.openstreetmap.org/search"
+            headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
+            # We broaden the search slightly to ensure we get regional results
+            full_query = f"{query}, Córdoba, Argentina"
+            params = {
+                "q": full_query,
+                "format": "json",
+                "limit": 5,
+                "addressdetails": 1
+            }
+            response = await client.get(url, params=params, headers=headers)
+            data = response.json()
+            
+            suggestions = []
+            for item in data:
+                suggestions.append({
+                    "display_name": item["display_name"],
+                    "lat": float(item["lat"]),
+                    "lng": float(item["lon"]),
+                    "city": item.get("address", {}).get("city") or item.get("address", {}).get("town") or item.get("address", {}).get("village")
+                })
+            return suggestions
+        except Exception as e:
+            print(f"Error searching addresses for {query}: {e}")
+            return []
+            
+    return []

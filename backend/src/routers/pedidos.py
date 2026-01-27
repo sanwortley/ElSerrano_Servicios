@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -5,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from src.db import get_db
 from src.models.business import PedidoIndividual, Pago
-from src.models.enums import Rol, EstadoPedido
+from src.models.enums import Rol, EstadoPedido, MetodoPago
 from src.models.users import Usuario, Chofer
 from src.schemas.all import PedidoRead, PedidoCreate, PagoCreate, PagoRead
 from src.deps import get_current_active_user
@@ -36,6 +37,17 @@ async def create_pedido(
     if not zona_id and lat and lng:
         zona_id = await find_zone_for_point(lat, lng, db)
     
+    # Late Entry Check
+    initial_status = EstadoPedido.CREADA
+    create_payment = False
+    
+    # Ensure naive comparison
+    exec_date = pedido.fecha_hora_ejecucion.replace(tzinfo=None) if pedido.fecha_hora_ejecucion else None
+    
+    if exec_date and exec_date < datetime.now():
+        initial_status = EstadoPedido.CARGA_TARDIA
+        create_payment = True
+
     new_pedido = PedidoIndividual(
         cliente_id=pedido.cliente_id,
         tipo_servicio=pedido.tipo_servicio,
@@ -45,15 +57,30 @@ async def create_pedido(
         zona_id=zona_id,
         descripcion=pedido.descripcion,
         costo=pedido.costo,
-        fecha_hora_ejecucion=pedido.fecha_hora_ejecucion.replace(tzinfo=None) if pedido.fecha_hora_ejecucion else None,
+        fecha_hora_ejecucion=exec_date,
         recepcionista_id=current_user.id,
-        orden_en_ruta=pedido.orden_en_ruta
+        orden_en_ruta=pedido.orden_en_ruta,
+        estado=initial_status
     )
     
     db.add(new_pedido)
     await db.commit()
     await db.refresh(new_pedido)
     
+    # Auto-charge for Late Entry
+    if create_payment:
+        # Use provided method or default to EFECTIVO
+        method = pedido.metodo_pago or MetodoPago.EFECTIVO
+        new_pago = Pago(
+            pedido_id=new_pedido.id,
+            monto=new_pedido.costo,
+            metodo_pago=method,
+            registrado_por=current_user.id,
+            fecha=datetime.now()
+        )
+        db.add(new_pago)
+        await db.commit()
+
     # Reload for response
     stmt = select(PedidoIndividual)\
         .where(PedidoIndividual.id == new_pedido.id)\
