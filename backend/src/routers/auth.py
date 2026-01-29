@@ -15,7 +15,7 @@ from src.deps import get_current_active_user, get_admin_user
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=Token)
-# @limiter.limit("5/minute")
+@limiter.limit("5/minute")
 async def login_for_access_token(
     request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
