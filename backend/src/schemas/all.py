@@ -18,6 +18,7 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase):
     id: int
+    require_password_change: bool
     creado_en: datetime
     
     class Config:
@@ -26,6 +27,7 @@ class UserRead(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    require_password_change: bool
 
 class TokenData(BaseModel):
     email: Optional[str] = None
@@ -35,6 +37,9 @@ class TokenData(BaseModel):
 class LoginRequest(BaseModel):
     email: str
     password: str
+
+class PasswordChange(BaseModel):
+    new_password: str
 
 # --- Chofer ---
 class ChoferBase(BaseModel):
@@ -105,6 +110,26 @@ class ClienteRead(ClienteBase):
     class Config:
         from_attributes = True
 
+class PagoCreate(BaseModel):
+    monto: float
+    metodo_pago: MetodoPago
+    pedido_id: Optional[int] = None
+    frecuente_id: Optional[int] = None
+    
+    @field_validator('monto')
+    def validate_target(cls, v, info):
+        return v
+
+class PagoRead(BaseModel):
+    id: int
+    monto: float
+    metodo_pago: MetodoPago
+    fecha: datetime
+    registrado_por: Optional[int] = None
+    
+    class Config:
+        from_attributes = True
+
 class PedidoBase(BaseModel):
     model_config = ConfigDict(from_attributes=True, kw_only=True)
     cliente_id: int
@@ -140,6 +165,7 @@ class PedidoRead(PedidoBase):
     fecha_hora_ejecucion: Optional[datetime] = None
     zona: Optional[ZonaRead] = None
     chofer: Optional[ChoferRead] = None
+    pagos: List[PagoRead] = []
     
     class Config:
         from_attributes = True
@@ -185,26 +211,6 @@ class FrecuenteRead(FrecuenteBase):
     class Config:
         from_attributes = True
 
-class PagoCreate(BaseModel):
-    monto: float
-    metodo_pago: MetodoPago
-    pedido_id: Optional[int] = None
-    frecuente_id: Optional[int] = None
-    
-    @field_validator('monto')
-    def validate_target(cls, v, info):
-        # We can implement specific validation here if needed
-        return v
-
-class PagoRead(BaseModel):
-    id: int
-    monto: float
-    metodo_pago: MetodoPago
-    fecha: datetime
-    registrado_por: Optional[int] = None
-    
-    class Config:
-        from_attributes = True
 class SesionTrabajoBase(BaseModel):
     model_config = ConfigDict(from_attributes=True, kw_only=True)
     chofer_id: int

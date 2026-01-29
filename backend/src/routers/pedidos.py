@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Annotated, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from src.utils.security_extras import log_action
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -20,6 +21,7 @@ def check_staff_or_admin(user: Usuario):
 
 @router.post("/", response_model=PedidoRead)
 async def create_pedido(
+    request: Request,
     pedido: PedidoCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[Usuario, Depends(get_current_active_user)]
@@ -66,6 +68,9 @@ async def create_pedido(
     db.add(new_pedido)
     await db.commit()
     await db.refresh(new_pedido)
+
+    # Audit
+    await log_action(current_user.id, "CREATE_PEDIDO", "pedidos", new_pedido.id, request=request)
     
     # Auto-charge for Late Entry
     if create_payment:
@@ -87,7 +92,8 @@ async def create_pedido(
         .options(
             selectinload(PedidoIndividual.cliente), 
             selectinload(PedidoIndividual.zona), 
-            selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+            selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+            selectinload(PedidoIndividual.pagos)
         )
     result = await db.execute(stmt)
     return result.scalar_one()
@@ -101,7 +107,8 @@ async def read_pedidos(
     stmt = select(PedidoIndividual).options(
         selectinload(PedidoIndividual.cliente), 
         selectinload(PedidoIndividual.zona), 
-        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+        selectinload(PedidoIndividual.pagos)
     )
     
     if current_user.rol == Rol.CHOFER:
@@ -127,7 +134,8 @@ async def read_pedido(
     stmt = select(PedidoIndividual).where(PedidoIndividual.id == pedido_id).options(
         selectinload(PedidoIndividual.cliente), 
         selectinload(PedidoIndividual.zona), 
-        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+        selectinload(PedidoIndividual.pagos)
     )
     result = await db.execute(stmt)
     pedido = result.scalar_one_or_none()
@@ -143,6 +151,7 @@ async def read_pedido(
 
 @router.put("/{pedido_id}", response_model=PedidoRead)
 async def update_pedido(
+    request: Request,
     pedido_id: int,
     pedido_upd: PedidoCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -184,17 +193,22 @@ async def update_pedido(
     await db.commit()
     await db.refresh(db_pedido)
     
+    # Audit
+    await log_action(current_user.id, "UPDATE_PEDIDO", "pedidos", db_pedido.id, request=request)
+    
     # Reload relationships for PedidoRead
     stmt = select(PedidoIndividual).where(PedidoIndividual.id == pedido_id).options(
         selectinload(PedidoIndividual.cliente), 
         selectinload(PedidoIndividual.zona), 
-        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+        selectinload(PedidoIndividual.pagos)
     )
     result = await db.execute(stmt)
     return result.scalar_one()
 
 @router.patch("/{pedido_id}/estado", response_model=PedidoRead)
 async def update_estado_pedido(
+    request: Request,
     pedido_id: int,
     estado: EstadoPedido,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -203,7 +217,8 @@ async def update_estado_pedido(
     stmt = select(PedidoIndividual).where(PedidoIndividual.id == pedido_id).options(
         selectinload(PedidoIndividual.cliente), 
         selectinload(PedidoIndividual.zona), 
-        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+        selectinload(PedidoIndividual.pagos)
     )
     result = await db.execute(stmt)
     pedido = result.scalar_one_or_none()
@@ -218,11 +233,15 @@ async def update_estado_pedido(
     pedido.estado = estado
     await db.commit()
     
+    # Audit
+    await log_action(current_user.id, f"UPDATE_STATUS_{estado.value}", "pedidos", pedido.id, request=request)
+    
     # Re-load with relationships because refresh() expires them
     stmt = select(PedidoIndividual).where(PedidoIndividual.id == pedido_id).options(
         selectinload(PedidoIndividual.cliente), 
         selectinload(PedidoIndividual.zona), 
-        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+        selectinload(PedidoIndividual.pagos)
     )
     result = await db.execute(stmt)
     pedido = result.scalar_one()
@@ -240,7 +259,8 @@ async def assign_driver_pedido(
     stmt = select(PedidoIndividual).where(PedidoIndividual.id == pedido_id).options(
         selectinload(PedidoIndividual.cliente), 
         selectinload(PedidoIndividual.zona), 
-        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+        selectinload(PedidoIndividual.pagos)
     )
     result = await db.execute(stmt)
     pedido = result.scalar_one_or_none()
@@ -257,7 +277,8 @@ async def assign_driver_pedido(
     stmt = select(PedidoIndividual).where(PedidoIndividual.id == pedido_id).options(
         selectinload(PedidoIndividual.cliente), 
         selectinload(PedidoIndividual.zona), 
-        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+        selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+        selectinload(PedidoIndividual.pagos)
     )
     result = await db.execute(stmt)
     pedido = result.scalar_one()
@@ -265,6 +286,7 @@ async def assign_driver_pedido(
 
 @router.post("/{pedido_id}/pagos", response_model=PagoRead)
 async def create_pago(
+    request: Request,
     pedido_id: int,
     pago: PagoCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -289,10 +311,15 @@ async def create_pago(
     db.add(new_pago)
     await db.commit()
     await db.refresh(new_pago)
+
+    # Audit Payment
+    await log_action(current_user.id, "REGISTER_PAYMENT", "pedidos", pedido_id, {"monto": pago.monto, "metodo": pago.metodo_pago}, request=request)
+    
     return new_pago
 
 @router.delete("/{pedido_id}")
 async def delete_pedido(
+    request: Request,
     pedido_id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[Usuario, Depends(get_current_active_user)]
@@ -306,4 +333,8 @@ async def delete_pedido(
     
     await db.delete(pedido)
     await db.commit()
+
+    # Audit
+    await log_action(current_user.id, "DELETE_PEDIDO", "pedidos", pedido_id, request=request)
+
     return {"ok": True}

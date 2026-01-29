@@ -41,3 +41,10 @@ test_*.py
 *.zip
 *.mp4
 el_serranoServicios/
+
+# Project Folders
+_logs/
+.venv/
+node_modules/
+dist/
+build/

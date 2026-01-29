@@ -15,6 +15,7 @@ class Usuario(Base):
     password_hash: Mapped[str] = mapped_column(String)
     rol: Mapped[Rol] = mapped_column(Enum(Rol), default=Rol.RECEPCIONISTA)
     activo: Mapped[bool] = mapped_column(Boolean, default=True)
+    require_password_change: Mapped[bool] = mapped_column(Boolean, default=True)
     creado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
 
     # Relationships

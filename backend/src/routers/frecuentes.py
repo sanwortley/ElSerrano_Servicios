@@ -1,5 +1,6 @@
 from typing import Annotated, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from src.utils.security_extras import log_action
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -238,6 +239,7 @@ async def toggle_frecuente(
 async def create_pago_frecuente(
     id: int,
     pago: PagoCreate,
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[Usuario, Depends(get_current_active_user)]
 ):
@@ -255,6 +257,10 @@ async def create_pago_frecuente(
     db.add(new_pago)
     await db.commit()
     await db.refresh(new_pago)
+    
+    # Audit Payment
+    await log_action(current_user.id, "REGISTER_PAYMENT", "frecuentes", id, {"monto": pago.monto, "metodo": pago.metodo_pago}, request=request)
+    
     return new_pago
 
 @router.delete("/{id}")

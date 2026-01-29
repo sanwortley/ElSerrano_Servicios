@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str
     
     NOMINATIM_USER_AGENT: str = "volquetes-gestion-app"
+    GEMINI_API_KEY: str | None = None
     
     def model_post_init(self, __context) -> None:
         if self.DATABASE_URL and "asyncpg" not in self.DATABASE_URL:

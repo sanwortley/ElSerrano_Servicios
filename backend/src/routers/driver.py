@@ -14,6 +14,8 @@ from src.schemas.all import PedidoRead, FrecuenteRead, ZonaRead, ChoferRead
 from src.deps import get_current_active_user
 from src.utils.optimization import sort_by_nearest_neighbor
 from src.utils.time_utils import get_now_arg
+from src.utils.security_extras import log_action
+from fastapi import Request
 
 router = APIRouter(prefix="/chofer", tags=["Chofer"])
 
@@ -150,6 +152,7 @@ async def get_driver_today(
     )
 @router.post("/shift/start")
 async def start_shift(
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[Usuario, Depends(get_current_active_user)]
 ):
@@ -172,10 +175,12 @@ async def start_shift(
     )
     db.add(new_session)
     await db.commit()
+    await log_action(current_user.id, "START_SHIFT", "shifts", current_user.chofer_perfil.id, request=request)
     return {"status": "Shift started", "inicio": new_session.inicio}
 
 @router.post("/shift/stop")
 async def stop_shift(
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[Usuario, Depends(get_current_active_user)]
 ):
@@ -200,6 +205,7 @@ async def stop_shift(
     
     await db.commit()
     print(f"ADMIN LOG: Chofer {current_user.nombre} finalizó turno. Trabajó {session.total_horas:.2f} horas.")
+    await log_action(current_user.id, "STOP_SHIFT", "shifts", current_user.chofer_perfil.id, detalles={"horas": session.total_horas}, request=request)
     return {"status": "Shift stopped", "horas": session.total_horas}
 
 @router.get("/shift/status")

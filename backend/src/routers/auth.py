@@ -1,6 +1,7 @@
 from datetime import timedelta
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from src.utils.security_extras import limiter, log_action
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -8,13 +9,15 @@ from src.db import get_db
 from src.security import create_access_token, get_password_hash, verify_password
 from src.models.users import Usuario
 from src.models.enums import Rol
-from src.schemas.all import Token, UserRead, UserCreate
+from src.schemas.all import Token, UserRead, UserCreate, PasswordChange
 from src.deps import get_current_active_user, get_admin_user
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=Token)
+# @limiter.limit("5/minute")
 async def login_for_access_token(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
@@ -47,11 +50,30 @@ async def login_for_access_token(
         data={"sub": user.email, "role": user.rol.value, "id": user.id},
         expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+
+    # Audit login
+    await log_action(user.id, "LOGIN", "auth", user.id, request=request)
+
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "require_password_change": user.require_password_change
+    }
 
 @router.get("/me", response_model=UserRead)
 async def read_users_me(current_user: Annotated[Usuario, Depends(get_current_active_user)]):
     return current_user
+
+@router.post("/change-password")
+async def change_password(
+    data: PasswordChange,
+    current_user: Annotated[Usuario, Depends(get_current_active_user)],
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    current_user.password_hash = get_password_hash(data.new_password)
+    current_user.require_password_change = False
+    await db.commit()
+    return {"ok": True, "msg": "Contraseña actualizada correctamente"}
 
 @router.post("/users", response_model=UserRead)
 async def create_user(

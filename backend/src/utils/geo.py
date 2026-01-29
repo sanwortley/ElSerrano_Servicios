@@ -26,9 +26,23 @@ async def get_lat_lng(address: str, db: AsyncSession):
     async with httpx.AsyncClient() as client:
         try:
             url = "https://nominatim.openstreetmap.org/search"
-            headers = {"User-Agent": settings.NOMINATIM_USER_AGENT}
-            full_query = f"{address}, Calamuchita, Córdoba, Argentina"
-            params = {"q": full_query, "format": "json", "limit": 1}
+            headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
+            
+            # Build a cleaner query
+            clean_query = address
+            if "córdoba" not in clean_query.lower():
+                clean_query += ", Córdoba"
+            if "argentina" not in clean_query.lower():
+                clean_query += ", Argentina"
+
+            # Use viewbox to bias results towards the operative region (Calamuchita/Córdoba)
+            params = {
+                "q": clean_query,
+                "format": "json",
+                "limit": 1,
+                "viewbox": "-65.0,-32.5,-63.0,-30.5",
+                "bounded": 0
+            }
             response = await client.get(url, params=params, headers=headers)
             data = response.json()
             
@@ -49,7 +63,7 @@ async def get_lat_lng(address: str, db: AsyncSession):
                 
                 return lat, lng
         except Exception as e:
-            print(f"Geocoding error: {e}")
+            print(f"Geocoding error for {address}: {e}")
             return None, None
             
     return None, None
@@ -114,23 +128,49 @@ async def search_addresses(query: str):
             url = "https://nominatim.openstreetmap.org/search"
             headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
             # We broaden the search slightly to ensure we get regional results
-            full_query = f"{query}, Córdoba, Argentina"
+            # Try to get more results and bias them towards the region
             params = {
-                "q": full_query,
+                "q": query,
                 "format": "json",
-                "limit": 5,
-                "addressdetails": 1
+                "limit": 10,
+                "addressdetails": 1,
+                "viewbox": "-65.0,-32.5,-63.0,-30.5", # Bounding box roughly for Córdoba region
+                "bounded": 0 # Bias but don't strictly bound if no results found
             }
+            # Add regional hints to string if not present
+            if "córdoba" not in query.lower():
+                params["q"] += ", Córdoba, Argentina"
+
             response = await client.get(url, params=params, headers=headers)
             data = response.json()
             
             suggestions = []
+            import re
+            # Extract number from query if present (e.g., "Street 123" -> 123)
+            query_number = None
+            num_match = re.search(r'\b(\d+)\b', query)
+            if num_match:
+                query_number = num_match.group(1)
+
             for item in data:
+                addr = item.get("address", {})
+                house_number = addr.get("house_number")
+                road = addr.get("road") or addr.get("pedestrian") or addr.get("cycleway") or addr.get("path")
+                
+                # If OSM didn't find the house number but the user typed one, 
+                # and we found the right road, let's "inject" it for better UX
+                display_name = item["display_name"]
+                if query_number and not house_number:
+                    # If the display name doesn't have the number but we have the road
+                    if road and road.lower() in display_name.lower() and query_number not in display_name:
+                        # Prepend or insert number after road
+                        display_name = f"{road} {query_number}, {display_name.split(road, 1)[-1].strip(', ')}"
+
                 suggestions.append({
-                    "display_name": item["display_name"],
+                    "display_name": display_name,
                     "lat": float(item["lat"]),
                     "lng": float(item["lon"]),
-                    "city": item.get("address", {}).get("city") or item.get("address", {}).get("town") or item.get("address", {}).get("village")
+                    "city": addr.get("city") or addr.get("town") or addr.get("village") or addr.get("suburb") or addr.get("neighbourhood")
                 })
             return suggestions
         except Exception as e:

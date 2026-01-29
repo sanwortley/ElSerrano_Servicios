@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
+from src.utils.security_extras import limiter, RateLimitExceeded, _rate_limit_exceeded_handler
 from src.db import engine, Base, AsyncSessionLocal
 from src.models import users, geo, business
 from sqlalchemy import select
@@ -9,7 +10,7 @@ from src.security import get_password_hash
 from src.models.users import Usuario
 from src.models.enums import Rol
 
-from src.routers import auth, zones, rutas, clientes, pedidos, frecuentes, driver, balances, dashboard
+from src.routers import auth, zones, rutas, clientes, pedidos, frecuentes, driver, balances, dashboard, ai, public, audit
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,10 +41,14 @@ def create_app() -> FastAPI:
         version="2.0.0",
         lifespan=lifespan
     )
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
     origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
         "http://localhost:3000", 
     ]
 
@@ -65,6 +70,9 @@ def create_app() -> FastAPI:
     app.include_router(driver.router)
     app.include_router(balances.router)
     app.include_router(dashboard.router)
+    app.include_router(ai.router)
+    app.include_router(public.router)
+    app.include_router(audit.router)
 
     @app.get("/")
     async def root():
