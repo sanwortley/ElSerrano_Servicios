@@ -3,8 +3,8 @@ services:
   - type: web
     name: el-serrano-backend
     runtime: python
-    buildCommand: pip install -r requirements.txt
-    preDeployCommand: alembic upgrade head
+    plan: free
+    buildCommand: pip install -r requirements.txt && alembic upgrade head
     startCommand: uvicorn backend.src.app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
@@ -32,6 +32,7 @@ services:
   - type: web
     name: el-serrano-frontend
     runtime: static
+    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     rootDirectory: frontend
