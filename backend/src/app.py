@@ -15,24 +15,11 @@ from src.routers import auth, zones, rutas, clientes, pedidos, frecuentes, drive
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with AsyncSessionLocal() as db:
-        stmt = select(Usuario).where(Usuario.rol == Rol.ADMIN)
-        result = await db.execute(stmt)
-        admin = result.scalar_one_or_none()
-        if not admin:
-            print("Creating default Admin user...")
-            new_admin = Usuario(
-                nombre="Super Admin",
-                email=settings.ADMIN_EMAIL,
-                password_hash=get_password_hash(settings.ADMIN_PASSWORD),
-                rol=Rol.ADMIN,
-                activo=True
-            )
-            db.add(new_admin)
-            await db.commit()
-            print(f"Admin created: {settings.ADMIN_EMAIL}")
-            
+    # Startup: Just log that we are starting
+    print("Startup: Volquetes Gestión API V2 is starting...", flush=True)
     yield
+    # Shutdown: Clean up resources
+    print("Shutdown: Cleaning up resources...", flush=True)
     await engine.dispose()
 
 def create_app() -> FastAPI:
