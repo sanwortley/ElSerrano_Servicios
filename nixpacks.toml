@@ -1,12 +1,18 @@
-# Instrucciones explicitas para Railway
 [phases.setup]
 nixPkgs = ["nodejs", "python3"]
 
 [phases.install]
-cmds = ["cd frontend && npm install"]
+# Instalamos en la raíz por si acaso y luego en el frontend
+cmds = [
+  "if [ -f frontend/package.json ]; then cd frontend && npm install; else npm install; fi"
+]
 
 [phases.build]
-cmds = ["cd frontend && npm run build"]
+# Construimos buscando la carpeta correcta
+cmds = [
+  "if [ -d frontend ]; then cd frontend && npm run build; else npm run build; fi"
+]
 
 [start]
-cmd = "cd frontend && npm run dev -- --host 0.0.0.0 --port $PORT"
+# Arrancamos detectando la ruta
+cmd = "if [ -d frontend ]; then cd frontend && npm run dev -- --host 0.0.0.0 --port $PORT; else npm run dev -- --host 0.0.0.0 --port $PORT; fi"
