@@ -29,8 +29,9 @@ services:
         sync: false
 
   # Frontend Service
-  - type: static_site
+  - type: web
     name: el-serrano-frontend
+    env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     rootDirectory: frontend
