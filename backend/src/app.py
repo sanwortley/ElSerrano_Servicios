@@ -54,8 +54,8 @@ def create_app() -> FastAPI:
         "http://localhost:3000", 
     ]
 
-    # If running on Render, allow all for demo ease
-    if os.getenv("RENDER"):
+    # If running on Render or Railway, allow all for demo ease
+    if os.getenv("RENDER") or os.getenv("RAILWAY_ENVIRONMENT"):
         origins = ["*"]
 
     app.add_middleware(
