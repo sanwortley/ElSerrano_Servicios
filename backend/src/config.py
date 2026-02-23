@@ -18,11 +18,19 @@ class Settings(BaseSettings):
     
     def model_post_init(self, __context) -> None:
         if self.DATABASE_URL:
+            # Clean up whitespace and potential quotes
+            self.DATABASE_URL = self.DATABASE_URL.strip().strip('"').strip("'")
+            
+            # Print for debugging (safe version)
+            print(f"DEBUG: DATABASE_URL starts with: {self.DATABASE_URL[:15]}... (Length: {len(self.DATABASE_URL)})")
+            
             # Handle both 'postgres://' and 'postgresql://'
             if self.DATABASE_URL.startswith("postgres://"):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
             elif self.DATABASE_URL.startswith("postgresql://") and "asyncpg" not in self.DATABASE_URL:
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+            
+            print(f"DEBUG: Final DATABASE_URL scheme: {self.DATABASE_URL.split('://')[0]}")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
