@@ -17,9 +17,12 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str | None = None
     
     def model_post_init(self, __context) -> None:
-        if self.DATABASE_URL and "asyncpg" not in self.DATABASE_URL:
-            # Force asyncpg driver even if env var is sync
-            self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+        if self.DATABASE_URL:
+            # Handle both 'postgres://' and 'postgresql://'
+            if self.DATABASE_URL.startswith("postgres://"):
+                self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif self.DATABASE_URL.startswith("postgresql://") and "asyncpg" not in self.DATABASE_URL:
+                self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
