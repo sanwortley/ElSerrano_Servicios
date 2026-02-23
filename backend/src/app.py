@@ -15,8 +15,19 @@ from src.routers import auth, zones, rutas, clientes, pedidos, frecuentes, drive
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Run migrations and create admin
-    print("Startup: Running automatic setup...", flush=True)
+    # Startup: Run migrations programmatically
+    print("Startup: Running database migrations...", flush=True)
+    try:
+        import subprocess
+        # Use the same PYTHONPATH logic as in manual commands
+        env = os.environ.copy()
+        env["PYTHONPATH"] = "backend"
+        subprocess.run(["alembic", "upgrade", "head"], check=True, env=env)
+        print("Startup: Migrations completed successfully.", flush=True)
+    except Exception as e:
+        print(f"Startup: Migration error (might be already up to date): {e}", flush=True)
+
+    # Now create admin
     async with AsyncSessionLocal() as db:
         try:
             # Look for existing admin
