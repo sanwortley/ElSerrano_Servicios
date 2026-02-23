@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
@@ -16,21 +17,28 @@ class Settings(BaseSettings):
     NOMINATIM_USER_AGENT: str = "volquetes-gestion-app"
     GEMINI_API_KEY: str | None = None
     
-    def model_post_init(self, __context) -> None:
-        if self.DATABASE_URL:
-            # Clean up whitespace and potential quotes
-            self.DATABASE_URL = self.DATABASE_URL.strip().strip('"').strip("'")
+    @model_validator(mode='after')
+    def validate_and_transform_db_url(self) -> 'Settings':
+        if not self.DATABASE_URL:
+            print("CRITICAL: DATABASE_URL is empty!", flush=True)
+            return self
             
-            # Print for debugging (safe version)
-            print(f"DEBUG: DATABASE_URL starts with: {self.DATABASE_URL[:15]}... (Length: {len(self.DATABASE_URL)})")
-            
-            # Handle both 'postgres://' and 'postgresql://'
-            if self.DATABASE_URL.startswith("postgres://"):
-                self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
-            elif self.DATABASE_URL.startswith("postgresql://") and "asyncpg" not in self.DATABASE_URL:
-                self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
-            
-            print(f"DEBUG: Final DATABASE_URL scheme: {self.DATABASE_URL.split('://')[0]}")
+        # Clean up whitespace and potential quotes (can happen in Railway/Render env vars)
+        self.DATABASE_URL = self.DATABASE_URL.strip().strip('"').strip("'")
+        
+        # Verbose debug for Railway logs
+        print(f"DEBUG: Processing DATABASE_URL (len: {len(self.DATABASE_URL)})", flush=True)
+        print(f"DEBUG: Raw scheme: {self.DATABASE_URL.split('://')[0]}", flush=True)
+        
+        # Handle both 'postgres://' and 'postgresql://'
+        # SQLAlchemy 1.4+ requires 'postgresql' and we need 'asyncpg' for our async engine
+        if self.DATABASE_URL.startswith("postgres://"):
+            self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif self.DATABASE_URL.startswith("postgresql://") and "asyncpg" not in self.DATABASE_URL:
+            self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+        
+        print(f"DEBUG: Final scheme: {self.DATABASE_URL.split('://')[0]}", flush=True)
+        return self
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
