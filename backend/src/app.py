@@ -60,24 +60,25 @@ def create_app() -> FastAPI:
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+    # CORS configuration
     origins = [
         "http://localhost:5173",
         "https://localhost:5173",
         "http://127.0.0.1:5173",
         "https://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:3000", 
+        "http://localhost:4173",
+        "https://el-serrano-frontend-production.up.railway.app",
     ]
 
     # If running on Render or Railway, allow all for demo ease
-    if os.getenv("RENDER") or os.getenv("RAILWAY_ENVIRONMENT"):
+    if os.getenv("RENDER") or os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("RAILWAY_ENVIRONMENT_NAME"):
+        print("CORS: Environment detected, allowing all origins (*)", flush=True)
         origins = ["*"]
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_credentials=True if origins != ["*"] else False, # Credentials must be False if origin is *
+        allow_credentials=False if origins == ["*"] else True,
         allow_methods=["*"],
         allow_headers=["*"],
         expose_headers=["*"],
