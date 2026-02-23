@@ -17,28 +17,28 @@ class Settings(BaseSettings):
     NOMINATIM_USER_AGENT: str = "volquetes-gestion-app"
     GEMINI_API_KEY: str | None = None
     
-    @model_validator(mode='after')
-    def validate_and_transform_db_url(self) -> 'Settings':
-        if not self.DATABASE_URL:
-            print("CRITICAL: DATABASE_URL is empty!", flush=True)
-            return self
-            
-        # Clean up whitespace and potential quotes (can happen in Railway/Render env vars)
-        self.DATABASE_URL = self.DATABASE_URL.strip().strip('"').strip("'")
-        
-        # Verbose debug for Railway logs
-        print(f"DEBUG: Processing DATABASE_URL (len: {len(self.DATABASE_URL)})", flush=True)
-        print(f"DEBUG: Raw scheme: {self.DATABASE_URL.split('://')[0]}", flush=True)
-        
-        # Handle both 'postgres://' and 'postgresql://'
-        # SQLAlchemy 1.4+ requires 'postgresql' and we need 'asyncpg' for our async engine
-        if self.DATABASE_URL.startswith("postgres://"):
-            self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
-        elif self.DATABASE_URL.startswith("postgresql://") and "asyncpg" not in self.DATABASE_URL:
-            self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
-        
-        print(f"DEBUG: Final scheme: {self.DATABASE_URL.split('://')[0]}", flush=True)
-        return self
+    @model_validator(mode='before')
+    @classmethod
+    def pre_validate_settings(cls, data: dict) -> dict:
+        if isinstance(data, dict):
+            db_url = data.get("DATABASE_URL")
+            if db_url and isinstance(db_url, str):
+                # Clean up if the user pasted "DATABASE_URL=..." into the value field
+                if "DATABASE_URL=" in db_url:
+                    db_url = db_url.split("DATABASE_URL=")[-1]
+                
+                # Extreme cleaning
+                db_url = db_url.strip().strip('"').strip("'").strip()
+                
+                # Force async driver
+                if db_url.startswith("postgres://"):
+                    db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+                elif db_url.startswith("postgresql://") and "+asyncpg" not in db_url:
+                    db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+                
+                data["DATABASE_URL"] = db_url
+                print(f"INFO: Database URL cleaned and driver forced.", flush=True)
+        return data
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
