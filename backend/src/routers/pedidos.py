@@ -307,6 +307,9 @@ async def create_pago(
         registrado_por=current_user.id
     )
     db_pedido.estado = EstadoPedido.COMPLETADA
+    db_pedido.monto_reportado = None
+    db_pedido.metodo_reportado = None
+    db_pedido.observaciones_chofer = None
     
     db.add(new_pago)
     await db.commit()

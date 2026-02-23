@@ -245,8 +245,14 @@ async def create_pago_frecuente(
 ):
     check_staff(current_user)
     stmt = select(ServicioFrecuente).where(ServicioFrecuente.id == id)
-    if not (await db.execute(stmt)).scalar_one_or_none():
+    db_item = (await db.execute(stmt)).scalar_one_or_none()
+    if not db_item:
          raise HTTPException(status_code=404, detail="Service not found")
+    
+    db_item.estado = EstadoFrecuente.COMPLETADA
+    db_item.monto_reportado = None
+    db_item.metodo_reportado = None
+    db_item.observaciones_chofer = None
          
     new_pago = Pago(
         frecuente_id=id, # Ensure validation XOR in logic if needed, but schema separates.

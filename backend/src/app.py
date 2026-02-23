@@ -54,10 +54,14 @@ def create_app() -> FastAPI:
         "http://localhost:3000", 
     ]
 
+    # If running on Render, allow all for demo ease
+    if os.getenv("RENDER"):
+        origins = ["*"]
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_credentials=True,
+        allow_credentials=True if origins != ["*"] else False, # Credentials must be False if origin is *
         allow_methods=["*"],
         allow_headers=["*"],
         expose_headers=["*"],

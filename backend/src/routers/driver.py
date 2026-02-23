@@ -11,7 +11,7 @@ from src.models.business import PedidoIndividual, ServicioFrecuente
 from src.models.enums import Rol, EstadoPedido, EstadoFrecuente
 from src.models.users import Usuario, Chofer
 from src.schemas.all import PedidoRead, FrecuenteRead, ZonaRead, ChoferRead
-from src.deps import get_current_active_user
+from src.deps import get_current_active_user, get_admin_user
 from src.utils.optimization import sort_by_nearest_neighbor
 from src.utils.time_utils import get_now_arg
 from src.utils.security_extras import log_action
@@ -98,7 +98,8 @@ async def get_driver_today(
         .options(
             selectinload(PedidoIndividual.cliente), 
             selectinload(PedidoIndividual.zona), 
-            selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario)
+            selectinload(PedidoIndividual.chofer).selectinload(Chofer.usuario),
+            selectinload(PedidoIndividual.pagos)
         )
         
     pedidos = (await db.execute(stmt_ped)).scalars().all()
@@ -252,3 +253,75 @@ async def register_expense(
     db.add(new_gasto)
     await db.commit()
     return {"status": "Gasto registrado"}
+
+class PaymentReport(BaseModel):
+    id: int
+    tipo: str # "Individual" or "Recurrente"
+    monto: float
+    metodo: str
+    observaciones: Optional[str] = None
+
+@router.post("/report-payment")
+async def report_payment(
+    report: PaymentReport,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[Usuario, Depends(get_current_active_user)]
+):
+    if current_user.rol != Rol.CHOFER or not current_user.chofer_perfil:
+        raise HTTPException(status_code=403, detail="Only drivers can report payments")
+    
+    if report.tipo == "Individual":
+        stmt = select(PedidoIndividual).where(PedidoIndividual.id == report.id)
+        res = await db.execute(stmt)
+        item = res.scalar_one_or_none()
+        if not item: raise HTTPException(404, "Pedido not found")
+        if item.chofer_id != current_user.chofer_perfil.id: raise HTTPException(403, "Not your pedido")
+        
+        item.estado = EstadoPedido.PAGO_PENDIENTE
+        item.monto_reportado = report.monto
+        item.metodo_reportado = report.metodo
+        item.observaciones_chofer = report.observaciones
+    else:
+        stmt = select(ServicioFrecuente).where(ServicioFrecuente.id == report.id)
+        res = await db.execute(stmt)
+        item = res.scalar_one_or_none()
+        if not item: raise HTTPException(404, "Frecuente not found")
+        if item.chofer_id != current_user.chofer_perfil.id: raise HTTPException(403, "Not your service")
+        
+        item.estado = EstadoFrecuente.PAGO_PENDIENTE
+        item.monto_reportado = report.monto
+        item.metodo_reportado = report.metodo
+        item.observaciones_chofer = report.observaciones
+
+    await db.commit()
+    return {"status": "Pago reportado correctamente"}
+
+@router.delete("/{chofer_id}")
+async def delete_chofer(
+    chofer_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    admin=Depends(get_admin_user)
+):
+    # Find chofer
+    stmt = select(Chofer).where(Chofer.id == chofer_id)
+    result = await db.execute(stmt)
+    chofer = result.scalar_one_or_none()
+    
+    if not chofer:
+        raise HTTPException(status_code=404, detail="Chofer no encontrado")
+    
+    # Identify the user associated with this chofer
+    user_id = chofer.usuario_id
+    
+    # Delete Chofer profile
+    await db.delete(chofer)
+    
+    # Delete the user associated
+    stmt_user = select(Usuario).where(Usuario.id == user_id)
+    res_user = await db.execute(stmt_user)
+    user = res_user.scalar_one_or_none()
+    if user:
+        await db.delete(user)
+    
+    await db.commit()
+    return {"ok": True, "msg": "Chofer y usuario eliminados"}

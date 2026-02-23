@@ -1,8 +1,8 @@
 import asyncio
 from src.db import AsyncSessionLocal, engine
 from src.models.users import Usuario
-from src.security import get_password_hash
 from sqlalchemy import select
+import bcrypt
 
 async def reset_admin():
     async with AsyncSessionLocal() as db:
@@ -11,7 +11,10 @@ async def reset_admin():
         admin = result.scalar_one_or_none()
         if admin:
             print("Admin encontrado. Reseteando contraseña a '1234'...")
-            admin.password_hash = get_password_hash("1234")
+            # Use bcrypt directly to avoid passlib bugs in some environments
+            salt = bcrypt.gensalt()
+            hashed = bcrypt.hashpw(b"1234", salt).decode('utf-8')
+            admin.password_hash = hashed
             admin.require_password_change = False
             await db.commit()
             print("Contraseña reseteada con éxito.")

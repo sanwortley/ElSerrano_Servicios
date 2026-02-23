@@ -7,7 +7,7 @@ from src.models.geo import Zona
 from src.schemas.all import ZonaRead, ZonaCreate
 from src.deps import get_admin_user
 
-from src.utils.geo import get_lat_lng, find_zone_for_point, get_locality_boundary, search_addresses
+from src.utils.geo import get_lat_lng, find_zone_for_point, get_locality_boundary, search_addresses, reverse_geocode
 from shapely.geometry import shape, mapping
 from shapely.ops import unary_union
 import json
@@ -145,9 +145,10 @@ async def merge_geometries(
 @router.get("/suggest-address")
 async def suggest_address(
     q: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
     admin=Depends(get_admin_user)
 ):
-    return await search_addresses(q)
+    return await search_addresses(q, db)
 
 @router.delete("/{zona_id}")
 async def delete_zona(
@@ -164,3 +165,14 @@ async def delete_zona(
     await db.delete(zona)
     await db.commit()
     return {"ok": True}
+
+@router.get("/reverse")
+async def reverse_geocode_endpoint(
+    lat: float,
+    lng: float,
+    admin=Depends(get_admin_user)
+):
+    result = await reverse_geocode(lat, lng)
+    if not result:
+        raise HTTPException(status_code=404, detail="No se pudo determinar la dirección")
+    return result

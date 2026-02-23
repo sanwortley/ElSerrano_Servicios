@@ -44,6 +44,11 @@ class PedidoIndividual(Base):
     
     creado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
     actualizado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg, onupdate=get_now_arg)
+    
+    # Campo para el "aviso de pago" del chofer
+    monto_reportado: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    metodo_reportado: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    observaciones_chofer: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     # Relationships
     cliente: Mapped["Cliente"] = relationship("Cliente")
@@ -80,6 +85,11 @@ class ServicioFrecuente(Base):
     
     creado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
     actualizado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg, onupdate=get_now_arg)
+
+    # Campo para el "aviso de pago" del chofer
+    monto_reportado: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    metodo_reportado: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    observaciones_chofer: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     # Relationships
     cliente: Mapped["Cliente"] = relationship("Cliente")

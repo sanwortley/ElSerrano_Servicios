@@ -24,19 +24,22 @@ async def login_for_access_token(
     # Authenticate user manually since we didn't export authenticate_user from security yet?
     # Wait, I didn't write authenticate_user in security.py. I'll add it here or update security.py
     # I'll implement logic here for simplicity or update security.py. Logic is simple.
-    print(f"Login attempt for: {form_data.username}")
-    stmt = select(Usuario).where(Usuario.email == form_data.username)
+    username = form_data.username.strip()
+    print(f"Login attempt for: {username}")
+    stmt = select(Usuario).where(Usuario.email == username)
     result = await db.execute(stmt)
     user = result.scalar_one_or_none()
     
     if user:
-        print(f"User found: {user.email}")
+        print(f"User found: {user.email}, Role: {user.rol}, Active: {user.activo}")
         is_valid = verify_password(form_data.password, user.password_hash)
+        print(f"Password provided: {form_data.password}")
         print(f"Password valid: {is_valid}")
     else:
         print(f"User not found: {form_data.username}")
     
     if not user or not verify_password(form_data.password, user.password_hash):
+        print("AUTHENTICATION FAILED")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

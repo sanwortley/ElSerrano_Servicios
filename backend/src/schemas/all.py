@@ -166,6 +166,9 @@ class PedidoRead(PedidoBase):
     zona: Optional[ZonaRead] = None
     chofer: Optional[ChoferRead] = None
     pagos: List[PagoRead] = []
+    monto_reportado: Optional[float] = None
+    metodo_reportado: Optional[str] = None
+    observaciones_chofer: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -185,6 +188,7 @@ class FrecuenteBase(BaseModel):
     lat: Optional[float] = None
     lng: Optional[float] = None
     orden_en_ruta: Optional[int] = None
+    zona_id: Optional[int] = None
 
     @field_validator('fecha_inicio', 'fecha_fin', mode='after')
     @classmethod
@@ -207,6 +211,9 @@ class FrecuenteRead(FrecuenteBase):
     chofer_id: Optional[int] = None
     zona: Optional[ZonaRead] = None
     chofer: Optional[ChoferRead] = None
+    monto_reportado: Optional[float] = None
+    metodo_reportado: Optional[str] = None
+    observaciones_chofer: Optional[str] = None
     
     class Config:
         from_attributes = True
