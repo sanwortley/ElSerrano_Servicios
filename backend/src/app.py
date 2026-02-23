@@ -15,10 +15,38 @@ from src.routers import auth, zones, rutas, clientes, pedidos, frecuentes, drive
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Just log that we are starting
-    print("Startup: Volquetes Gestión API V2 is starting...", flush=True)
+    # Startup: Run migrations and create admin
+    print("Startup: Running automatic setup...", flush=True)
+    async with AsyncSessionLocal() as db:
+        try:
+            # Look for existing admin
+            from sqlalchemy import select
+            from src.models.users import Usuario
+            from src.models.enums import Rol
+            from src.security import get_password_hash
+            
+            result = await db.execute(select(Usuario).filter(Usuario.email == settings.ADMIN_EMAIL))
+            admin = result.scalar_one_or_none()
+            
+            if not admin:
+                print(f"Startup: Creating default admin: {settings.ADMIN_EMAIL}", flush=True)
+                new_admin = Usuario(
+                    nombre="Admin",
+                    email=settings.ADMIN_EMAIL,
+                    password_hash=get_password_hash(settings.ADMIN_PASSWORD),
+                    rol=Rol.ADMIN,
+                    activo=True
+                )
+                db.add(new_admin)
+                await db.commit()
+                print("Startup: Admin created successfully.", flush=True)
+            else:
+                print("Startup: Admin already exists.", flush=True)
+        except Exception as e:
+            print(f"Startup Error during user check: {e}", flush=True)
+            
     yield
-    # Shutdown: Clean up resources
+    # Shutdown
     print("Shutdown: Cleaning up resources...", flush=True)
     await engine.dispose()
 
