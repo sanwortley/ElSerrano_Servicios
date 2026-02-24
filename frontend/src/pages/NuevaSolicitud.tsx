@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Search, UserPlus, MapPin, FileText, Navigation, X, Sparkles } from 'lucide-react';
+import { PlusCircle, Search, UserPlus, MapPin, FileText, Navigation, X } from 'lucide-react';
 import api from '../api/axios';
 import { MapPicker } from '../components/MapPicker';
 
@@ -56,46 +56,6 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
         lng: null as number | null
     });
 
-    // Magic Paste
-    const [magicText, setMagicText] = useState('');
-    const [isMagicLoading, setIsMagicLoading] = useState(false);
-
-    const handleMagicPaste = async () => {
-        if (!magicText.trim()) return;
-        setIsMagicLoading(true);
-        try {
-            const res = await api.post('/ai/parse-order', { text: magicText });
-            if (res.data.error) {
-                alert(res.data.error);
-                return;
-            }
-
-            // Fill new client data
-            setNewClienteData({
-                nombre: res.data.nombre || '',
-                telefono: res.data.telefono || '',
-                direccion: res.data.direccion || '',
-                lat: null,
-                lng: null
-            });
-            setShowNewClienteForm(true);
-
-            // Fill solicitud details
-            setFormData(prev => ({
-                ...prev,
-                tipo_servicio: res.data.tipo_servicio || prev.tipo_servicio,
-                direccion: res.data.direccion || prev.direccion,
-                descripcion: res.data.descripcion || prev.descripcion
-            }));
-
-            setMsg({ type: 'success', text: '¡IA Ha procesado el mensaje! Revisa los datos en "Nuevo Cliente".' });
-        } catch (err) {
-            console.error(err);
-            alert("Error al procesar con IA");
-        } finally {
-            setIsMagicLoading(false);
-        }
-    };
 
     useEffect(() => {
         fetchClientes();
@@ -313,38 +273,6 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
                 </div>
             </div>
 
-            {/* PEGADO MÁGICO SECTION */}
-            <div className="card card-instagram" style={{
-                marginBottom: '2.5rem',
-                background: 'linear-gradient(45deg, #000, #1a1a1a)',
-                border: '1px solid #444',
-                padding: '2rem'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                    <Sparkles size={28} color="#facc15" />
-                    <div>
-                        <h3 className="heading-brand" style={{ fontSize: '1.3rem', color: 'white', margin: 0 }}>PEGADO MÁGICO (IA)</h3>
-                        <p style={{ fontSize: '0.7rem', color: '#888', margin: 0 }}>PEGA EL MENSAJE DE WHATSAPP Y LA IA CARGARÁ TODO</p>
-                    </div>
-                </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <textarea
-                        className="form-control"
-                        placeholder="Ej: Hola! Soy Santiago, necesito un volquete para mañana en Ayacucho 9. Mi tel es 351..."
-                        style={{ height: '5rem', resize: 'none', background: '#0a0a0a', border: '1px solid #333', fontSize: '0.9rem' }}
-                        value={magicText}
-                        onChange={(e) => setMagicText(e.target.value)}
-                    />
-                    <button
-                        className="btn btn-primary"
-                        style={{ width: '150px', background: 'var(--primary-color)' }}
-                        onClick={handleMagicPaste}
-                        disabled={isMagicLoading}
-                    >
-                        {isMagicLoading ? 'PROCESANDO...' : 'PROCESAR'}
-                    </button>
-                </div>
-            </div>
 
             {msg.text && (
                 <div className={`badge ${msg.type === 'success' ? 'badge-success' : 'badge-danger'}`} style={{ width: '100%', padding: '1.5rem', marginBottom: '2rem', textAlign: 'center', borderRadius: '4px' }}>
