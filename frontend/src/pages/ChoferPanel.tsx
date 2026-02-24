@@ -12,6 +12,7 @@ interface DriverData {
 export const ChoferPanel: React.FC = () => {
     const [data, setData] = useState<DriverData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [reportingService, setReportingService] = useState<any | null>(null);
 
     useEffect(() => {
@@ -19,6 +20,7 @@ export const ChoferPanel: React.FC = () => {
     }, []);
 
     const fetchHoy = async () => {
+        setRefreshing(true);
         try {
             const res = await api.get('/chofer/hoy');
             setData(res.data);
@@ -26,6 +28,7 @@ export const ChoferPanel: React.FC = () => {
             console.error("Error fetching hoy", err);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
 
@@ -59,34 +62,52 @@ export const ChoferPanel: React.FC = () => {
                         <p className="heading-brand" style={{ fontSize: '1.5rem', color: 'white', margin: 0 }}>{(data?.zona_de_hoy?.nombre || 'GENERAL').toUpperCase()}</p>
                         <button
                             onClick={fetchHoy}
+                            disabled={refreshing}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.5rem',
-                                background: 'rgba(255, 84, 0, 0.1)',
+                                background: refreshing ? 'rgba(255, 84, 0, 0.4)' : 'rgba(255, 84, 0, 0.1)',
                                 border: '1px solid var(--primary-color)',
                                 color: 'white',
                                 fontSize: '0.7rem',
                                 padding: '0.4rem 0.8rem',
                                 marginTop: '0.75rem',
-                                cursor: 'pointer',
+                                cursor: refreshing ? 'not-allowed' : 'pointer',
                                 fontWeight: 800,
                                 borderRadius: '2px',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.1em',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                opacity: refreshing ? 0.7 : 1
                             }}
                             onMouseOver={(e) => {
-                                e.currentTarget.style.background = 'var(--primary-color)';
-                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                if (!refreshing) {
+                                    e.currentTarget.style.background = 'var(--primary-color)';
+                                    e.currentTarget.style.transform = 'translateY(-1px)';
+                                }
                             }}
                             onMouseOut={(e) => {
-                                e.currentTarget.style.background = 'rgba(255, 84, 0, 0.1)';
-                                e.currentTarget.style.transform = 'translateY(0)';
+                                if (!refreshing) {
+                                    e.currentTarget.style.background = 'rgba(255, 84, 0, 0.1)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }
                             }}
                         >
-                            <RefreshCcw size={14} /> ACTUALIZAR
+                            <RefreshCcw
+                                size={14}
+                                style={{
+                                    animation: refreshing ? 'spin 1s linear infinite' : 'none'
+                                }}
+                            />
+                            {refreshing ? 'ACTUALIZANDO...' : 'ACTUALIZAR'}
                         </button>
+                        <style>{`
+                            @keyframes spin {
+                                from { transform: rotate(0deg); }
+                                to { transform: rotate(360deg); }
+                            }
+                        `}</style>
                     </div>
                 </div>
                 <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.2)' }}>
