@@ -33,7 +33,7 @@ class PedidoIndividual(Base):
     zona_id: Mapped[Optional[int]] = mapped_column(ForeignKey("zonas.id"), nullable=True)
     descripcion: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     costo: Mapped[float] = mapped_column(Float)
-    estado: Mapped[EstadoPedido] = mapped_column(Enum(EstadoPedido), default=EstadoPedido.CREADA)
+    estado: Mapped[EstadoPedido] = mapped_column(Enum(EstadoPedido, native_enum=False), default=EstadoPedido.CREADA)
     
     fecha_hora_recepcion: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
     fecha_hora_ejecucion: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -80,7 +80,7 @@ class ServicioFrecuente(Base):
     dia_saliente: Mapped[Optional[str]] = mapped_column(String, nullable=True) # Specific exit day
     
     chofer_id: Mapped[Optional[int]] = mapped_column(ForeignKey("choferes.id"), nullable=True)
-    estado: Mapped[EstadoFrecuente] = mapped_column(Enum(EstadoFrecuente), default=EstadoFrecuente.ACTIVO)
+    estado: Mapped[EstadoFrecuente] = mapped_column(Enum(EstadoFrecuente, native_enum=False), default=EstadoFrecuente.ACTIVO)
     orden_en_ruta: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     
     creado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
@@ -105,7 +105,7 @@ class Pago(Base):
     pedido_id: Mapped[Optional[int]] = mapped_column(ForeignKey("pedidos_individuales.id"), nullable=True)
     frecuente_id: Mapped[Optional[int]] = mapped_column(ForeignKey("servicios_frecuentes.id"), nullable=True)
     monto: Mapped[float] = mapped_column(Float)
-    metodo_pago: Mapped[MetodoPago] = mapped_column(Enum(MetodoPago))
+    metodo_pago: Mapped[MetodoPago] = mapped_column(Enum(MetodoPago, native_enum=False))
     fecha: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
     registrado_por: Mapped[Optional[int]] = mapped_column(ForeignKey("usuarios.id"), nullable=True)
 
