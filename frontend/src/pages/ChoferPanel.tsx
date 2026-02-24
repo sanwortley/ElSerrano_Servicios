@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Truck, CheckCircle, Navigation, Phone } from 'lucide-react';
+import { MapPin, Truck, CheckCircle, Navigation, Phone, RefreshCcw } from 'lucide-react';
 import api from '../api/axios';
 
 interface DriverData {
@@ -60,17 +60,32 @@ export const ChoferPanel: React.FC = () => {
                         <button
                             onClick={fetchHoy}
                             style={{
-                                background: 'transparent',
-                                border: '1px solid #333',
-                                color: 'var(--primary-color)',
-                                fontSize: '0.6rem',
-                                padding: '0.2rem 0.5rem',
-                                marginTop: '0.5rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                background: 'rgba(255, 84, 0, 0.1)',
+                                border: '1px solid var(--primary-color)',
+                                color: 'white',
+                                fontSize: '0.7rem',
+                                padding: '0.4rem 0.8rem',
+                                marginTop: '0.75rem',
                                 cursor: 'pointer',
-                                fontWeight: 700
+                                fontWeight: 800,
+                                borderRadius: '2px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.background = 'var(--primary-color)';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseOut={(e) => {
+                                e.currentTarget.style.background = 'rgba(255, 84, 0, 0.1)';
+                                e.currentTarget.style.transform = 'translateY(0)';
                             }}
                         >
-                            🔄 ACTUALIZAR
+                            <RefreshCcw size={14} /> ACTUALIZAR
                         </button>
                     </div>
                 </div>
