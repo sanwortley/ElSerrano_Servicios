@@ -97,7 +97,7 @@ export const Individuales: React.FC = () => {
 
     return (
         <div style={{ padding: '0 1rem' }}>
-            <div style={{
+            <div className="mobile-stack mobile-padding-sm" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -105,7 +105,8 @@ export const Individuales: React.FC = () => {
                 background: 'rgba(255, 84, 0, 0.05)',
                 padding: '1.5rem',
                 borderRadius: '4px',
-                border: '1px solid #222'
+                border: '1px solid #222',
+                gap: '1.5rem'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                     <ClipboardList size={40} color="var(--primary-color)" />
@@ -115,7 +116,7 @@ export const Individuales: React.FC = () => {
                     </div>
                 </div>
                 <button
-                    className={`btn ${showForm ? 'btn-danger' : 'btn-primary'}`}
+                    className={`btn ${showForm ? 'btn-danger' : 'btn-primary'} mobile-full-width`}
                     onClick={() => setShowForm(!showForm)}
                     style={{ height: '3.5rem', padding: '0 2rem', fontWeight: 800 }}
                 >
@@ -150,7 +151,7 @@ export const Individuales: React.FC = () => {
                         </button>
                     </div>
 
-                    <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))' }}>
+                    <div className="responsive-grid-cards">
                         {filteredPedidos.length === 0 ? (
                             <div className="card card-instagram" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem', backgroundColor: '#000' }}>
                                 <AlertCircle size={60} color="#222" style={{ marginBottom: '1.5rem' }} />
@@ -222,7 +223,7 @@ export const Individuales: React.FC = () => {
                                         </div>
 
                                         {activeTab === 'active' ? (
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                            <div className="responsive-grid-2" style={{ gap: '1rem' }}>
                                                 {(p.estado === 'CREADA' || p.estado === 'ASIGNADA') && (
                                                     <button
                                                         className="btn btn-primary"

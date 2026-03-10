@@ -78,66 +78,68 @@ export const Logs: React.FC = () => {
             </div>
 
             <div className="card" style={{ padding: 0, overflow: 'hidden', backgroundColor: '#000', border: '1px solid #222' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead style={{ backgroundColor: '#050505', borderBottom: '2px solid #222' }}>
-                        <tr>
-                            <th style={{ padding: '1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>FECHA / HORA</th>
-                            <th style={{ padding: '1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>USUARIO</th>
-                            <th style={{ padding: '1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>ACCIÓN</th>
-                            <th style={{ padding: '1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>RECURSO</th>
-                            <th style={{ padding: '1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>IP</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
+                <div className="table-container">
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead style={{ backgroundColor: '#050505', borderBottom: '2px solid #222' }}>
                             <tr>
-                                <td colSpan={5} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: 800 }}>CARGANDO...</td>
+                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>FECHA / HORA</th>
+                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>USUARIO</th>
+                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>ACCIÓN</th>
+                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>RECURSO</th>
+                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>IP</th>
                             </tr>
-                        ) : filteredLogs.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: 800 }}>SIN ACTIVIDAD RECIENTE</td>
-                            </tr>
-                        ) : (
-                            filteredLogs.map(log => (
-                                <tr key={log.id} style={{ borderBottom: '1px solid #111' }}>
-                                    <td style={{ padding: '1.5rem' }}>
-                                        <div style={{ fontSize: '0.85rem', color: 'white', fontWeight: 600 }}>
-                                            {new Date(log.timestamp + 'Z').toLocaleDateString('es-AR')}
-                                        </div>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                            <Clock size={10} /> {new Date(log.timestamp + 'Z').toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1.5rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', fontWeight: 800, fontSize: '0.85rem' }}>
-                                            <User size={14} color="var(--primary-color)" /> {log.user.toUpperCase()}
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1.5rem' }}>
-                                        <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--primary-color)' }}>{log.accion}</span>
-                                        {log.detalles && (
-                                            <div style={{ fontSize: '0.65rem', color: '#999', marginTop: '0.4rem', background: '#111', padding: '0.4rem', borderRadius: '4px' }}>
-                                                {Object.entries(log.detalles).map(([k, v]) => (
-                                                    <div key={k} style={{ display: 'flex', gap: '0.3rem' }}>
-                                                        <span style={{ fontWeight: 700, textTransform: 'uppercase' }}>{k}:</span>
-                                                        <span>{String(v)}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td style={{ padding: '1.5rem' }}>
-                                        <div style={{ fontSize: '0.8rem', color: 'white', fontWeight: 600 }}>{log.recurso.toUpperCase()}</div>
-                                        {log.recurso_id && <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>ID: #{log.recurso_id}</div>}
-                                    </td>
-                                    <td style={{ padding: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                                        {log.ip || '---'}
-                                    </td>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={5} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: 800 }}>CARGANDO...</td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : filteredLogs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: 800 }}>SIN ACTIVIDAD RECIENTE</td>
+                                </tr>
+                            ) : (
+                                filteredLogs.map(log => (
+                                    <tr key={log.id} style={{ borderBottom: '1px solid #111' }}>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ fontSize: '0.8rem', color: 'white', fontWeight: 600 }}>
+                                                {new Date(log.timestamp + 'Z').toLocaleDateString('es-AR')}
+                                            </div>
+                                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                <Clock size={10} /> {new Date(log.timestamp + 'Z').toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', fontWeight: 800, fontSize: '0.8rem' }}>
+                                                <User size={14} color="var(--primary-color)" /> {log.user.toUpperCase()}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--primary-color)' }}>{log.accion}</span>
+                                            {log.detalles && (
+                                                <div style={{ fontSize: '0.6rem', color: '#999', marginTop: '0.4rem', background: '#111', padding: '0.4rem', borderRadius: '4px' }}>
+                                                    {Object.entries(log.detalles).map(([k, v]) => (
+                                                        <div key={k} style={{ display: 'flex', gap: '0.3rem' }}>
+                                                            <span style={{ fontWeight: 700, textTransform: 'uppercase' }}>{k}:</span>
+                                                            <span>{String(v)}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ fontSize: '0.75rem', color: 'white', fontWeight: 600 }}>{log.recurso.toUpperCase()}</div>
+                                            {log.recurso_id && <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>ID: #{log.recurso_id}</div>}
+                                        </td>
+                                        <td className="ip-column" style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                                            {log.ip || '---'}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

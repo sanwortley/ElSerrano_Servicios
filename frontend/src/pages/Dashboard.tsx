@@ -143,26 +143,28 @@ export const Dashboard: React.FC = () => {
     });
 
     return (
-        <div style={{ padding: '0 1rem' }}>
+        <div style={{ padding: '0 0.5rem' }}>
+            {/* Dashboard Header */}
             <div style={{
-                marginBottom: '2rem',
+                marginBottom: '1.5rem',
                 background: 'rgba(255, 84, 0, 0.05)',
-                padding: '2rem',
+                padding: '1.5rem 1rem',
                 borderRadius: '4px',
-                borderLeft: '8px solid var(--primary-color)',
+                borderLeft: '6px solid var(--primary-color)',
                 position: 'relative',
                 border: '1px solid #222'
             }}>
-                <h1 style={{ fontSize: '3.5rem', margin: 0, lineHeight: 0.9, color: 'white' }}>PANEL DE CONTROL</h1>
-                <p style={{ color: 'white', fontWeight: 800, marginTop: '0.5rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '1.2rem', fontFamily: 'Anton' }}>
+                <h1 style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1, color: 'white' }}>PANEL DE CONTROL</h1>
+                <p style={{ color: 'white', fontWeight: 800, marginTop: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'Anton' }}>
                     EL <span style={{ color: 'var(--primary-color)' }}>SERRANO SERVICIOS</span>
                 </p>
-                <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', opacity: 0.1 }}>
-                    <BarChart3 size={80} color="white" />
+                <div style={{ position: 'absolute', top: '1rem', right: '1rem', opacity: 0.1 }} className="hide-on-mobile">
+                    <BarChart3 size={60} color="white" />
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+            {/* Stat Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
                 {cards.map((card, i) => (
                     <div
                         key={i}
@@ -173,49 +175,51 @@ export const Dashboard: React.FC = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             cursor: 'pointer',
+                            padding: '1.25rem'
                         }}
                     >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                             <div style={{
-                                padding: '1rem',
+                                padding: '0.6rem',
                                 backgroundColor: i % 2 === 0 ? 'var(--primary-color)' : '#222',
                                 borderRadius: '2px',
                                 color: 'white'
                             }}>
-                                <card.icon size={24} />
+                                <card.icon size={20} />
                             </div>
                         </div>
-                        <h3 style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 800 }}>{card.title}</h3>
-                        <p style={{ fontSize: '2.8rem', color: 'white', fontFamily: 'Anton', margin: 0 }}>{card.value}</p>
+                        <h3 style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 800 }}>{card.title}</h3>
+                        <p style={{ fontSize: '2rem', color: 'white', fontFamily: 'Anton', margin: 0 }}>{card.value}</p>
                     </div>
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+            {/* Charts & Breakdown */}
+            <div className="responsive-grid-cards" style={{ marginBottom: '2rem' }}>
                 {/* Desglose de Pedidos */}
-                <div className="card" style={{ background: '#050505' }}>
-                    <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'white', fontFamily: 'Anton' }}>DESGLOSE ACTIVOS</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div className="card" style={{ background: '#050505', padding: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '1.2rem', color: 'white', fontFamily: 'Anton' }}>DESGLOSE ACTIVOS</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                         {stats?.breakdown && Object.entries(stats.breakdown).map(([tipo, count]) => (
-                            <div key={tipo} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', border: '1px solid #222', background: '#000' }}>
-                                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{tipo}</span>
-                                <span style={{ color: 'var(--primary-color)', fontWeight: 800 }}>{count}</span>
+                            <div key={tipo} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.6rem', border: '1px solid #222', background: '#000' }}>
+                                <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{tipo}</span>
+                                <span style={{ color: 'var(--primary-color)', fontWeight: 800, fontSize: '0.85rem' }}>{count}</span>
                             </div>
                         ))}
                     </div>
                 </div>
 
                 {/* Grafico de Ingresos */}
-                <div className="card" style={{ background: '#050505' }}>
-                    <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'white', fontFamily: 'Anton' }}>INGRESOS (30 DÍAS)</h3>
-                    <div style={{ height: '200px', width: '100%' }}>
+                <div className="card" style={{ background: '#050505', padding: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '1.2rem', color: 'white', fontFamily: 'Anton' }}>INGRESOS (30 DÍAS)</h3>
+                    <div style={{ height: '180px', width: '100%' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={charts?.daily_stats || []}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
                                 <XAxis dataKey="name" hide />
                                 <YAxis hide />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#000', border: '1px solid #333' }}
+                                    contentStyle={{ backgroundColor: '#000', border: '1px solid #333', fontSize: '0.8rem' }}
                                     itemStyle={{ color: 'var(--primary-color)', fontWeight: 800 }}
                                     formatter={(value: any) => [`$${(value || 0).toLocaleString()}`, 'Ingresos']}
                                 />
@@ -226,10 +230,11 @@ export const Dashboard: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
-                <div className="card" style={{ background: '#000', border: '2px solid #222' }}>
-                    <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'white', fontFamily: 'Anton' }}>ACCIONES RÁPIDAS</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            {/* Quick Actions & Collection */}
+            <div className="responsive-grid-cards" style={{ marginBottom: '2rem' }}>
+                <div className="card" style={{ background: '#000', border: '2px solid #222', padding: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '1.2rem', color: 'white', fontFamily: 'Anton' }}>ACCIONES RÁPIDAS</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                         <QuickAction
                             title="NUEVA SOLICITUD"
                             desc="CREAR PEDIDO"
@@ -237,78 +242,78 @@ export const Dashboard: React.FC = () => {
                         />
                         <QuickAction
                             title="GESTIÓN ABONOS"
-                            desc="SERVICIOS RECURRENTES"
+                            desc="SERVICIOS"
                             onClick={() => navigate('/frecuentes')}
                         />
                     </div>
                 </div>
 
                 {/* Quick Collection Section */}
-                <div className="card" style={{ background: '#050505', border: '1px solid #222' }}>
-                    <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'white', fontFamily: 'Anton', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <DollarSign size={24} color="var(--primary-color)" /> COBRO RÁPIDO Y PEDIDOS
+                <div className="card" style={{ background: '#050505', border: '1px solid #222', padding: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'white', fontFamily: 'Anton', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <DollarSign size={20} color="var(--primary-color)" /> COBRO RÁPIDO
                     </h3>
 
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
                         <button
                             className={`btn ${activeTab === 'active' ? 'btn-primary' : ''}`}
-                            style={{ border: activeTab === 'active' ? 'none' : '1px solid #333', background: activeTab === 'active' ? 'var(--primary-color)' : 'transparent', color: 'white' }}
+                            style={{ flex: 1, padding: '0.6rem', fontSize: '0.75rem', border: activeTab === 'active' ? 'none' : '1px solid #333', background: activeTab === 'active' ? 'var(--primary-color)' : 'transparent', color: 'white' }}
                             onClick={() => setActiveTab('active')}
                         >
                             ACTIVOS
                         </button>
                         <button
                             className={`btn ${activeTab === 'history' ? 'btn-primary' : ''}`}
-                            style={{ border: activeTab === 'history' ? 'none' : '1px solid #333', background: activeTab === 'history' ? '#333' : 'transparent', color: 'white' }}
+                            style={{ flex: 1, padding: '0.6rem', fontSize: '0.75rem', border: activeTab === 'history' ? 'none' : '1px solid #333', background: activeTab === 'history' ? '#333' : 'transparent', color: 'white' }}
                             onClick={() => setActiveTab('history')}
                         >
                             HISTORIAL
                         </button>
                     </div>
 
-                    <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-                        <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#444' }} />
+                    <div style={{ position: 'relative', marginBottom: '1rem' }}>
+                        <Search size={16} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: '#444' }} />
                         <input
                             type="text"
-                            placeholder="BUSCAR CLIENTE O N° PEDIDO..."
+                            placeholder="BUSCAR CLIENTE..."
                             className="form-control"
-                            style={{ paddingLeft: '3rem', fontSize: '0.8rem' }}
+                            style={{ paddingLeft: '2.5rem', fontSize: '0.75rem', height: '2.5rem' }}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                         {filteredPedidos.map((p: any) => (
                             <div key={p.id} style={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                padding: '1rem',
+                                padding: '0.8rem',
                                 background: activeTab === 'history' ? '#1a1a1a' : '#000',
                                 border: '1px solid #222',
                                 borderRadius: '4px',
-                                opacity: activeTab === 'history' ? 0.8 : 1,
-                                filter: activeTab === 'history' ? 'grayscale(100%)' : 'none'
+                                opacity: activeTab === 'history' ? 0.8 : 1
                             }}>
-                                <div>
-                                    <p style={{ margin: 0, fontWeight: 800, color: 'white', fontSize: '0.9rem' }}>{(p.cliente?.nombre || 'CLIENTE SIN NOMBRE').toUpperCase()}</p>
-                                    <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--text-muted)' }}>#{p.id} | {p.tipo_servicio}</p>
+                                <div style={{ overflow: 'hidden' }}>
+                                    <p style={{ margin: 0, fontWeight: 800, color: 'white', fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(p.cliente?.nombre || 'CLIENTE').toUpperCase()}</p>
+                                    <p style={{ margin: 0, fontSize: '0.65rem', color: 'var(--text-muted)' }}>#{p.id} | {p.tipo_servicio}</p>
                                 </div>
-                                <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <span style={{ fontFamily: 'Anton', color: activeTab === 'history' ? '#666' : 'var(--primary-color)' }}>${p.costo.toLocaleString()}</span>
+                                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem', minWidth: '80px' }}>
+                                    <span style={{ fontFamily: 'Anton', color: activeTab === 'history' ? '#666' : 'var(--primary-color)', fontSize: '0.9rem' }}>${p.costo.toLocaleString()}</span>
                                     {activeTab === 'active' && (
                                         <button
                                             onClick={() => setSelectedPedido(p)}
                                             style={{
                                                 background: 'var(--primary-color)',
                                                 border: 'none',
-                                                padding: '0.5rem 1rem',
+                                                padding: '0.4rem 0.6rem',
                                                 borderRadius: '2px',
                                                 color: 'white',
                                                 fontWeight: 800,
-                                                fontSize: '0.7rem',
-                                                cursor: 'pointer'
+                                                fontSize: '0.6rem',
+                                                cursor: 'pointer',
+                                                width: '100%'
                                             }}
                                         >
                                             COBRAR
@@ -325,65 +330,48 @@ export const Dashboard: React.FC = () => {
                                             style={{
                                                 background: (p.pagos && p.pagos.length > 0) ? '#333' : 'var(--primary-color)',
                                                 border: 'none',
-                                                padding: '0.5rem 1rem',
+                                                padding: '0.4rem 0.6rem',
                                                 borderRadius: '2px',
                                                 color: (p.pagos && p.pagos.length > 0) ? '#666' : 'white',
                                                 fontWeight: 800,
-                                                fontSize: '0.7rem',
-                                                cursor: (p.pagos && p.pagos.length > 0) ? 'not-allowed' : 'pointer'
+                                                fontSize: '0.6rem',
+                                                width: '100%'
                                             }}
                                         >
                                             {(p.pagos && p.pagos.length > 0) ? 'COBRADO' : 'COBRAR'}
                                         </button>
                                     )}
-                                    {activeTab === 'history' && p.estado === 'CANCELADA' && (
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#ef4444' }}>
-                                            CANCELADA
-                                        </span>
-                                    )}
-
                                 </div>
                             </div>
                         ))}
-                        {filteredPedidos.length === 0 && (
-                            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>No hay pedidos {activeTab === 'active' ? 'activos' : 'en el historial'}.</p>
-                        )}
-                    </div>
-                </div>
-
-                <div className="card" style={{ background: 'var(--primary-color)', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '1.5rem', border: 'none' }}>
-                    <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'Anton' }}>ESTADO</h3>
-                    <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.15)', borderRadius: '2px' }}>
-                        <p style={{ fontSize: '0.8rem', fontWeight: 800 }}>✅ SISTEMA OPERATIVO</p>
-                        <p style={{ fontSize: '0.8rem', fontWeight: 800 }}>✅ DB CONNECTED</p>
                     </div>
                 </div>
             </div>
 
             {/* Agenda de Abonos Hoy */}
             <div style={{ marginBottom: '3rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                    <h2 className="heading-brand" style={{ fontSize: '2rem', margin: 0, color: 'white' }}>PROGRAMADOS PARA HOY (ABONOS)</h2>
-                    <span className="badge badge-primary">{agendaHoy.length}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                    <h2 className="heading-brand" style={{ fontSize: '1.5rem', margin: 0, color: 'white' }}>PROGRAMADOS (ABONOS)</h2>
+                    <span className="badge badge-primary" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}>{agendaHoy.length}</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div className="responsive-grid-cards" style={{ gap: '1rem' }}>
                     {agendaHoy.map(item => (
-                        <div key={item.id} className="card" style={{ background: '#0A0A0A', border: '1px solid #333', padding: '1.5rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                <span style={{ color: 'var(--primary-color)', fontWeight: 800, fontSize: '0.7rem' }}>{item.tipo_servicio.toUpperCase()}</span>
-                                <span style={{ color: 'white', fontWeight: 800, fontSize: '0.7rem' }}>{item.zona?.nombre || 'SIN ZONA'}</span>
+                        <div key={item.id} className="card" style={{ background: '#0A0A0A', border: '1px solid #333', padding: '1.25rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+                                <span style={{ color: 'var(--primary-color)', fontWeight: 800, fontSize: '0.65rem' }}>{item.tipo_servicio.toUpperCase()}</span>
+                                <span style={{ color: 'white', fontWeight: 800, fontSize: '0.65rem' }}>{item.zona?.nombre || 'SIN ZONA'}</span>
                             </div>
-                            <h4 style={{ margin: '0 0 0.5rem 0', color: 'white', fontFamily: 'Anton', fontSize: '1.2rem' }}>{(item.cliente?.nombre || 'CLIENTE').toUpperCase()}</h4>
-                            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>{item.direccion}</p>
+                            <h4 style={{ margin: '0 0 0.4rem 0', color: 'white', fontFamily: 'Anton', fontSize: '1.1rem' }}>{(item.cliente?.nombre || 'CLIENTE').toUpperCase()}</h4>
+                            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.direccion}</p>
 
-                            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ background: '#222', padding: '0.4rem 0.8rem', borderRadius: '2px' }}>
-                                    <span style={{ color: 'white', fontWeight: 800, fontSize: '0.7rem' }}>CANT: {item.cantidad}</span>
+                            <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ background: '#222', padding: '0.3rem 0.6rem', borderRadius: '2px' }}>
+                                    <span style={{ color: 'white', fontWeight: 800, fontSize: '0.65rem' }}>CANT: {item.cantidad}</span>
                                 </div>
                                 <button
                                     className="btn btn-primary"
-                                    style={{ fontSize: '0.6rem', padding: '0.4rem 1rem' }}
+                                    style={{ fontSize: '0.6rem', padding: '0.4rem 0.8rem' }}
                                     onClick={() => setSelectedAbono(item)}
                                 >
                                     COBRAR

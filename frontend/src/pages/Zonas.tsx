@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Map, Save, CheckSquare, Square, Search, Plus, Trash2, X, MapPin } from 'lucide-react';
+import { Map, Save, Search, Plus, Trash2, X, MapPin } from 'lucide-react';
 import api from '../api/axios';
 
 interface Zona {
@@ -21,7 +21,7 @@ const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', '
 export const Zonas: React.FC = () => {
     const [zonas, setZonas] = useState<Zona[]>([]);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState<number | null>(null);
+
 
     // New Zone Form
     const [showNewForm, setShowNewForm] = useState(false);
@@ -125,7 +125,6 @@ export const Zonas: React.FC = () => {
     };
 
     const handleSave = async (zona: Zona) => {
-        setSaving(zona.id);
         try {
             await api.put(`/zonas/${zona.id}`, {
                 nombre: zona.nombre,
@@ -137,8 +136,6 @@ export const Zonas: React.FC = () => {
         } catch (err) {
             console.error("Error saving zona", err);
             alert("Error al guardar la zona.");
-        } finally {
-            setSaving(null);
         }
     };
 
@@ -156,7 +153,7 @@ export const Zonas: React.FC = () => {
 
     return (
         <div style={{ padding: '0 1rem', paddingBottom: '10rem' }}>
-            <div style={{
+            <div className="mobile-stack mobile-padding-sm" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
@@ -165,7 +162,8 @@ export const Zonas: React.FC = () => {
                 padding: '2.5rem',
                 borderRadius: '4px',
                 border: '1px solid #222',
-                borderLeft: '10px solid var(--primary-color)'
+                borderLeft: '10px solid var(--primary-color)',
+                gap: '1.5rem'
             }}>
                 <div>
                     <h1 style={{ fontSize: '3.5rem', margin: 0, lineHeight: 0.9, color: 'white', fontFamily: 'Anton' }}>GESTIÓN DE ZONAS</h1>
@@ -174,9 +172,9 @@ export const Zonas: React.FC = () => {
                     </p>
                 </div>
                 <button
-                    className={`btn ${showNewForm ? 'btn-danger' : 'btn-primary'}`}
+                    className={`btn ${showNewForm ? 'btn-danger' : 'btn-primary'} mobile-full-width`}
                     onClick={() => setShowNewForm(!showNewForm)}
-                    style={{ height: '4rem', padding: '0 2.5rem' }}
+                    style={{ height: '4rem', padding: '0 2.5rem', width: 'auto' }}
                 >
                     {showNewForm ? <X /> : <Plus />} {showNewForm ? 'CANCELAR' : 'NUEVA ZONA'}
                 </button>
@@ -186,7 +184,7 @@ export const Zonas: React.FC = () => {
                 <div className="card card-instagram" style={{ backgroundColor: '#000', border: '2px solid white', marginBottom: '4rem', padding: '3rem' }}>
                     <h2 className="heading-brand" style={{ fontSize: '2rem', marginBottom: '2rem', color: 'white' }}>CREAR NUEVA ÁREA OPERATIVA</h2>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
+                    <div className="responsive-grid-2" style={{ gap: '3rem' }}>
                         {/* Step 1: Name and Search */}
                         <div>
                             <div className="form-group" style={{ marginBottom: '2rem' }}>
@@ -276,7 +274,7 @@ export const Zonas: React.FC = () => {
                 </div>
             )}
 
-            <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))' }}>
+            <div className="responsive-grid-cards">
                 {zonas.map(zona => (
                     <div key={zona.id} className="card" style={{ backgroundColor: '#000', border: '1px solid #222', padding: '2rem', position: 'relative' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>

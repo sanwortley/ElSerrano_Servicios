@@ -281,7 +281,7 @@ export const Frecuentes: React.FC = () => {
 
     return (
         <div style={{ padding: '0 1rem', paddingBottom: '5rem' }}>
-            <div style={{
+            <div className="mobile-stack mobile-padding-sm" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -289,13 +289,14 @@ export const Frecuentes: React.FC = () => {
                 background: 'rgba(255, 84, 0, 0.05)',
                 padding: '2rem',
                 borderRadius: '4px',
-                border: '1px solid #222'
+                border: '1px solid #222',
+                gap: '1.5rem'
             }}>
                 <div>
                     <h1 className="heading-brand" style={{ fontSize: '3rem', margin: 0, color: 'white', lineHeight: 1 }}>SERVICIOS FRECUENTES</h1>
                     <p style={{ color: 'var(--primary-color)', fontWeight: 800, letterSpacing: '0.1em', marginTop: '0.25rem' }}>RECURRENCIA Y ABONOS V2.0</p>
                 </div>
-                <button className={`btn ${showForm ? 'btn-danger' : 'btn-primary'}`} onClick={() => setShowForm(!showForm)} style={{ height: '3.5rem', padding: '0 2rem' }}>
+                <button className={`btn ${showForm ? 'btn-danger' : 'btn-primary'} mobile-full-width`} onClick={() => setShowForm(!showForm)} style={{ height: '3.5rem', padding: '0 2rem' }}>
                     {showForm ? 'VOLVER AL LISTADO' : 'NUEVO ABONO'}
                 </button>
             </div>
@@ -322,7 +323,7 @@ export const Frecuentes: React.FC = () => {
             )}
 
             {!showForm ? (
-                <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))' }}>
+                <div className="responsive-grid-cards">
                     {filteredServices.map((service) => (
                         <div key={service.id} className="card card-instagram" style={{ backgroundColor: '#0A0A0A', border: '1px solid #333', position: 'relative' }}>
                             <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
@@ -486,7 +487,7 @@ export const Frecuentes: React.FC = () => {
                                 disabled={!!selectedClienteId}
                             />
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '1.5rem' }}>
+                        <div className="responsive-grid-2" style={{ marginBottom: '1.5rem' }}>
                             <div className="form-group" style={{ position: 'relative' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                                     <label className="form-label" style={{ color: 'var(--text-muted)', margin: 0 }}>UBICACIÓN PRINCIPAL</label>
@@ -568,7 +569,7 @@ export const Frecuentes: React.FC = () => {
                                 {TIPOS_SERVICIO.map(t => <option key={t} value={t}>{t.toUpperCase()}</option>)}
                             </select>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '1.5rem' }}>
+                        <div className="responsive-grid-2" style={{ marginBottom: '1.5rem' }}>
                             <div className="form-group">
                                 <label className="form-label" style={{ color: 'var(--text-muted)' }}>CANTIDAD</label>
                                 <input type="number" name="cantidad" min="1" required onChange={handleInputChange} className="form-control" value={formData.cantidad} />
@@ -578,7 +579,7 @@ export const Frecuentes: React.FC = () => {
                                 <input type="number" name="costo_individual" min="0" required onChange={handleInputChange} className="form-control" value={formData.costo_individual} />
                             </div>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '1.5rem' }}>
+                        <div className="responsive-grid-2" style={{ marginBottom: '1.5rem' }}>
                             <div className="form-group">
                                 <label className="form-label" style={{ color: 'var(--text-muted)' }}>FECHA INICIO</label>
                                 <input type="date" name="fecha_inicio" required onChange={handleInputChange} className="form-control" value={formData.fecha_inicio} />

@@ -120,7 +120,7 @@ export const Choferes: React.FC = () => {
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--text-muted)', fontWeight: 800 }}>CARGANDO...</div>
             ) : (
-                <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))' }}>
+                <div className="responsive-grid-cards">
                     {choferes.map(chofer => (
                         <div key={chofer.id} className="card card-instagram" style={{ backgroundColor: '#0A0A0A', border: '1px solid #333' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
@@ -141,7 +141,7 @@ export const Choferes: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', background: '#050505', padding: '1.5rem', borderRadius: '4px' }}>
+                            <div className="responsive-grid-2" style={{ gap: '1.5rem', background: '#050505', padding: '1.5rem', borderRadius: '4px' }}>
                                 <div>
                                     <p style={{ fontSize: '0.7rem', color: 'var(--primary-color)', fontWeight: 800, margin: '0 0 0.25rem 0' }}>PATENTE / UNIDAD</p>
                                     <p style={{ margin: 0, color: 'white', fontWeight: 700, fontSize: '1.1rem', fontFamily: 'Anton' }}>{chofer.patente.toUpperCase()}</p>
@@ -197,13 +197,13 @@ export const Choferes: React.FC = () => {
             {showForm && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    zIndex: 1000, backdropFilter: 'blur(4px)'
+                    backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+                    zIndex: 1000, backdropFilter: 'blur(4px)', overflowY: 'auto', padding: '2rem 1rem'
                 }}>
                     <div className="card card-instagram" style={{ width: '100%', maxWidth: '600px', backgroundColor: '#000', border: '1px solid #333', padding: '3rem' }}>
                         <h3 className="heading-brand" style={{ fontSize: '2rem', marginBottom: '2.5rem', color: 'white', textAlign: 'center' }}>REGISTRAR NUEVO CHOFER</h3>
                         <form onSubmit={handleCreate}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                            <div className="responsive-grid-2" style={{ gap: '1.5rem', marginBottom: '1.5rem' }}>
                                 <div className="form-group">
                                     <label className="form-label">NOMBRE COMPLETO</label>
                                     <input
@@ -223,7 +223,7 @@ export const Choferes: React.FC = () => {
                                     />
                                 </div>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                            <div className="responsive-grid-2" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
                                 <div className="form-group">
                                     <label className="form-label">TELÉFONO / WHATSAPP</label>
                                     <input
@@ -255,7 +255,7 @@ export const Choferes: React.FC = () => {
                             <div style={{ backgroundColor: 'rgba(255,84,0,0.1)', padding: '1rem', borderRadius: '4px', marginBottom: '2rem', border: '1px solid rgba(255,84,0,0.2)' }}>
                                 <p style={{ color: 'var(--primary-color)', fontSize: '0.8rem', fontWeight: 800, margin: 0 }}>NOTA: La contraseña por defecto será "1234". El chofer podrá cambiarla desde su panel.</p>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                            <div className="responsive-grid-2" style={{ gap: '1.5rem' }}>
                                 <button type="button" className="btn" style={{ background: '#111', color: 'white', border: '1px solid #222' }} onClick={() => setShowForm(false)}>CANCELAR</button>
                                 <button type="submit" className="btn btn-primary">REGISTRAR CHOFER</button>
                             </div>
@@ -273,7 +273,7 @@ export const Choferes: React.FC = () => {
                     borderRadius: '4px'
                 }}>
                     <h2 className="heading-brand" style={{ fontSize: '2rem', color: 'white', marginBottom: '1.5rem' }}>HISTORIAL DE JORNADAS</h2>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="table-container">
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid #222' }}>

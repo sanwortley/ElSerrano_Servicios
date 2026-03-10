@@ -121,7 +121,7 @@ export const Clientes: React.FC = () => {
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--text-muted)', fontWeight: 800 }}>CARGANDO...</div>
             ) : (
-                <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
+                <div className="responsive-grid-cards" style={{ gap: '1.5rem' }}>
                     {filtered.map(cliente => (
                         <div key={cliente.id} className="card card-instagram" style={{ backgroundColor: '#0A0A0A', border: '1px solid #333' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
@@ -232,7 +232,7 @@ export const Clientes: React.FC = () => {
                                     onChange={e => setEditingCliente({ ...editingCliente, telefono: e.target.value })}
                                 />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '2rem' }}>
+                            <div className="responsive-grid-2" style={{ gap: '1rem', marginTop: '2rem' }}>
                                 <button type="button" className="btn" style={{ background: '#111', color: 'white' }} onClick={() => setEditingCliente(null)}>CANCELAR</button>
                                 <button type="submit" className="btn btn-primary">GUARDAR CAMBIOS</button>
                             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, TrendingUp, FileText, Trash2, Edit3, Save, X, AlertTriangle, Fuel } from 'lucide-react';
+import { Wallet, TrendingUp, FileText, Trash2, Edit3, Save, X, Fuel } from 'lucide-react';
 import api from '../api/axios';
 import {
     ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar
@@ -43,19 +43,11 @@ interface DailyStat {
     frecuentes: number;
 }
 
-interface HoursData {
-    name: string;
-    [key: string]: string | number;
-}
-
 export const Balances: React.FC = () => {
     const [pagos, setPagos] = useState<PagoReciente[]>([]);
     const [gastos, setGastos] = useState<GastoReciente[]>([]);
     const [summary, setSummary] = useState<BalanceSummary | null>(null);
     const [dailyStats, setDailyStats] = useState<DailyStat[]>([]);
-    const [hoursData, setHoursData] = useState<HoursData[]>([]);
-    const [choferes, setChoferes] = useState<string[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [editingPagoId, setEditingPagoId] = useState<number | null>(null);
     const [editData, setEditData] = useState({ monto: 0, metodo_pago: '' });
@@ -72,7 +64,6 @@ export const Balances: React.FC = () => {
     }, []);
 
     const fetchData = async () => {
-        setLoading(true);
         try {
             const [pagosRes, summaryRes, gastosRes] = await Promise.all([
                 api.get('/balances/pagos'),
@@ -84,8 +75,6 @@ export const Balances: React.FC = () => {
             setGastos(gastosRes.data);
         } catch (err) {
             console.error("Error fetching balances", err);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -93,8 +82,6 @@ export const Balances: React.FC = () => {
         try {
             const res = await api.get('/balances/charts/daily', { params: { days: 30 } });
             setDailyStats(res.data.daily_stats);
-            setHoursData(res.data.hours_data);
-            setChoferes(res.data.choferes);
         } catch (err) {
             console.error("Error fetching charts", err);
         }
@@ -151,7 +138,7 @@ export const Balances: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '3rem' }}>
+            <div className="responsive-grid-2" style={{ marginBottom: '3rem' }}>
                 {/* Charts: Income & Expenses */}
                 <div className="card" style={{ backgroundColor: '#000', border: '1px solid #222', minHeight: '400px' }}>
                     <h3 className="heading-brand" style={{ fontSize: '1.1rem', marginBottom: '2rem', color: 'white' }}>EVOLUCIÓN ECONÓMICA (30 DÍAS)</h3>
@@ -189,7 +176,7 @@ export const Balances: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '350px 1fr', gap: '2rem' }}>
+            <div className="responsive-grid-sidebar">
                 {/* Column 1: Summary & Filters */}
                 <div>
                     <div className="card card-instagram" style={{ backgroundColor: '#000', border: '1px solid #333' }}>
@@ -255,89 +242,91 @@ export const Balances: React.FC = () => {
                         </div>
 
                         <div style={{ maxHeight: '420px', overflowY: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead style={{ backgroundColor: '#050505', position: 'sticky', top: 0, zIndex: 10 }}>
-                                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #222' }}>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>FECHA / ORIGEN</th>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>CLIENTE / DETALLE</th>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>MÉTODO</th>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center' }}>ACCIONES</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {pagos.map(p => (
-                                        <tr key={p.id} style={{ borderBottom: '1px solid #111' }}>
-                                            <td style={{ padding: '1rem' }}>
-                                                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>{new Date(p.fecha).toLocaleDateString('es-AR')}</div>
-                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{p.servicio.toUpperCase()}</div>
-                                            </td>
-                                            <td style={{ padding: '1rem' }}>
-                                                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                    {p.cliente}
-                                                    {p.estado_pedido === 'CARGA_TARDIA' && (
-                                                        <span className="badge badge-warning" style={{ fontSize: '0.5rem', padding: '0.1rem 0.3rem' }}>CARGA TARDÍA</span>
-                                                    )}
-                                                </div>
-                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>REG: {p.registrado_por}</div>
-                                            </td>
-                                            <td style={{ padding: '1rem' }}>
-                                                {editingPagoId === p.id ? (
-                                                    <select
-                                                        className="form-control"
-                                                        style={{ fontSize: '0.75rem', padding: '0.3rem' }}
-                                                        value={editData.metodo_pago}
-                                                        onChange={e => setEditData({ ...editData, metodo_pago: e.target.value })}
-                                                    >
-                                                        <option value="EFECTIVO">EFECTIVO</option>
-                                                        <option value="TRANSFERENCIA">TRANSFERENCIA</option>
-                                                        <option value="TARJETA">TARJETA</option>
-                                                        <option value="MERCADO_PAGO">MERCADO PAGO</option>
-                                                    </select>
-                                                ) : (
-                                                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ccc' }}>{p.metodo}</span>
-                                                )}
-                                            </td>
-                                            <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                                {editingPagoId === p.id ? (
-                                                    <input
-                                                        type="number"
-                                                        className="form-control"
-                                                        style={{ fontSize: '0.75rem', padding: '0.3rem', textAlign: 'right' }}
-                                                        value={editData.monto}
-                                                        onChange={e => setEditData({ ...editData, monto: Number(e.target.value) })}
-                                                    />
-                                                ) : (
-                                                    <span style={{ fontFamily: 'Anton', fontSize: '1.2rem', color: 'white' }}>${p.monto.toLocaleString()}</span>
-                                                )}
-                                            </td>
-                                            <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                                                    {editingPagoId === p.id ? (
-                                                        <>
-                                                            <button onClick={() => handleSaveEdit(p.id)} style={{ background: '#10b981', border: 'none', color: 'white', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                <Save size={14} />
-                                                            </button>
-                                                            <button onClick={() => setEditingPagoId(null)} style={{ background: '#333', border: 'none', color: 'white', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                <X size={14} />
-                                                            </button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button onClick={() => handleStartEdit(p)} style={{ background: 'transparent', border: '1px solid #333', color: '#aaa', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                <Edit3 size={14} />
-                                                            </button>
-                                                            <button onClick={() => handleDeletePago(p.id)} style={{ background: 'transparent', border: '1px solid #333', color: 'var(--danger-color)', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                <Trash2 size={14} />
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
+                            <div className="table-container">
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <thead style={{ backgroundColor: '#050505', position: 'sticky', top: 0, zIndex: 10 }}>
+                                        <tr style={{ textAlign: 'left', borderBottom: '2px solid #222' }}>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>FECHA / ORIGEN</th>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>CLIENTE / DETALLE</th>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>MÉTODO</th>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center' }}>ACCIONES</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {pagos.map(p => (
+                                            <tr key={p.id} style={{ borderBottom: '1px solid #111' }}>
+                                                <td style={{ padding: '1rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>{new Date(p.fecha).toLocaleDateString('es-AR')}</div>
+                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{p.servicio.toUpperCase()}</div>
+                                                </td>
+                                                <td style={{ padding: '1rem' }}>
+                                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        {p.cliente}
+                                                        {p.estado_pedido === 'CARGA_TARDIA' && (
+                                                            <span className="badge badge-warning" style={{ fontSize: '0.5rem', padding: '0.1rem 0.3rem' }}>CARGA TARDÍA</span>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>REG: {p.registrado_por}</div>
+                                                </td>
+                                                <td style={{ padding: '1rem' }}>
+                                                    {editingPagoId === p.id ? (
+                                                        <select
+                                                            className="form-control"
+                                                            style={{ fontSize: '0.75rem', padding: '0.3rem' }}
+                                                            value={editData.metodo_pago}
+                                                            onChange={e => setEditData({ ...editData, metodo_pago: e.target.value })}
+                                                        >
+                                                            <option value="EFECTIVO">EFECTIVO</option>
+                                                            <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                                            <option value="TARJETA">TARJETA</option>
+                                                            <option value="MERCADO_PAGO">MERCADO PAGO</option>
+                                                        </select>
+                                                    ) : (
+                                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ccc' }}>{p.metodo}</span>
+                                                    )}
+                                                </td>
+                                                <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                    {editingPagoId === p.id ? (
+                                                        <input
+                                                            type="number"
+                                                            className="form-control"
+                                                            style={{ fontSize: '0.75rem', padding: '0.3rem', textAlign: 'right' }}
+                                                            value={editData.monto}
+                                                            onChange={e => setEditData({ ...editData, monto: Number(e.target.value) })}
+                                                        />
+                                                    ) : (
+                                                        <span style={{ fontFamily: 'Anton', fontSize: '1.2rem', color: 'white' }}>${p.monto.toLocaleString()}</span>
+                                                    )}
+                                                </td>
+                                                <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                                        {editingPagoId === p.id ? (
+                                                            <>
+                                                                <button onClick={() => handleSaveEdit(p.id)} style={{ background: '#10b981', border: 'none', color: 'white', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <Save size={14} />
+                                                                </button>
+                                                                <button onClick={() => setEditingPagoId(null)} style={{ background: '#333', border: 'none', color: 'white', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <X size={14} />
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <button onClick={() => handleStartEdit(p)} style={{ background: 'transparent', border: '1px solid #333', color: '#aaa', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <Edit3 size={14} />
+                                                                </button>
+                                                                <button onClick={() => handleDeletePago(p.id)} style={{ background: 'transparent', border: '1px solid #333', color: 'var(--danger-color)', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -350,35 +339,37 @@ export const Balances: React.FC = () => {
                         </div>
 
                         <div style={{ maxHeight: '420px', overflowY: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead style={{ backgroundColor: '#050505', position: 'sticky', top: 0, zIndex: 10 }}>
-                                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #222' }}>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>FECHA / CATEGORÍA</th>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>DESCRIPCIÓN / RESPONSABLE</th>
-                                        <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {gastos.map(g => (
-                                        <tr key={g.id} style={{ borderBottom: '1px solid #111' }}>
-                                            <td style={{ padding: '1rem' }}>
-                                                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>{new Date(g.fecha).toLocaleDateString('es-AR')}</div>
-                                                <div style={{ fontSize: '0.65rem', color: '#ef4444', fontWeight: 800 }}>{g.categoria.toUpperCase()}</div>
-                                            </td>
-                                            <td style={{ padding: '1rem' }}>
-                                                <div style={{ fontSize: '0.8rem', color: 'white' }}>{g.descripcion || 'Sin descripción'}</div>
-                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>RESP: {g.chofer} | REG: {g.registrado_por}</div>
-                                            </td>
-                                            <td style={{ padding: '1rem', textAlign: 'right', fontFamily: 'Anton', fontSize: '1.2rem', color: 'white' }}>
-                                                -${g.monto.toLocaleString()}
-                                            </td>
+                            <div className="table-container">
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <thead style={{ backgroundColor: '#050505', position: 'sticky', top: 0, zIndex: 10 }}>
+                                        <tr style={{ textAlign: 'left', borderBottom: '2px solid #222' }}>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>FECHA / CATEGORÍA</th>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>DESCRIPCIÓN / RESPONSABLE</th>
+                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
                                         </tr>
-                                    ))}
-                                    {gastos.length === 0 && (
-                                        <tr><td colSpan={3} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>SIN GASTOS REGISTRADOS</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {gastos.map(g => (
+                                            <tr key={g.id} style={{ borderBottom: '1px solid #111' }}>
+                                                <td style={{ padding: '1rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>{new Date(g.fecha).toLocaleDateString('es-AR')}</div>
+                                                    <div style={{ fontSize: '0.65rem', color: '#ef4444', fontWeight: 800 }}>{g.categoria.toUpperCase()}</div>
+                                                </td>
+                                                <td style={{ padding: '1rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', color: 'white' }}>{g.descripcion || 'Sin descripción'}</div>
+                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>RESP: {g.chofer} | REG: {g.registrado_por}</div>
+                                                </td>
+                                                <td style={{ padding: '1rem', textAlign: 'right', fontFamily: 'Anton', fontSize: '1.2rem', color: 'white' }}>
+                                                    -${g.monto.toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {gastos.length === 0 && (
+                                            <tr><td colSpan={3} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>SIN GASTOS REGISTRADOS</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 

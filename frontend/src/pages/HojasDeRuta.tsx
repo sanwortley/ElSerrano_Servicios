@@ -153,7 +153,7 @@ export const HojasDeRuta: React.FC = () => {
                 </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '2rem' }}>
+            <div className="responsive-grid-sidebar">
                 <div className="card">
                     <h3 className="heading-brand" style={{ color: 'white', fontSize: '1.2rem', marginBottom: '1.5rem' }}>FILTROS</h3>
 
