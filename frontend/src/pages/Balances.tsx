@@ -256,11 +256,11 @@ export const Balances: React.FC = () => {
                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead style={{ backgroundColor: '#050505', position: 'sticky', top: 0, zIndex: 10 }}>
                                         <tr style={{ textAlign: 'left', borderBottom: '2px solid #222' }}>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>FECHA / ORIGEN</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>CLIENTE / DETALLE</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>MÉTODO</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center' }}>ACCIONES</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)' }}>FECHA</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)' }}>CLIENTE / DETALLE</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)' }} className="hide-on-mobile">MÉTODO</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center' }}>ACC.</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -270,20 +270,20 @@ export const Balances: React.FC = () => {
                                                     <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>{new Date(p.fecha).toLocaleDateString('es-AR')}</div>
                                                     <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{p.servicio.toUpperCase()}</div>
                                                 </td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <td style={{ padding: '0.5rem' }}>
+                                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.3rem', flexWrap: 'wrap' }}>
                                                         {p.cliente}
                                                         {p.estado_pedido === 'CARGA_TARDIA' && (
-                                                            <span className="badge badge-warning" style={{ fontSize: '0.5rem', padding: '0.1rem 0.3rem' }}>CARGA TARDÍA</span>
+                                                            <span className="badge badge-warning" style={{ fontSize: '0.5rem', padding: '0.1rem 0.2rem' }}>TARDÍA</span>
                                                         )}
                                                     </div>
-                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>REG: {p.registrado_por}</div>
+                                                    <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }} className="hide-on-mobile">REG: {p.registrado_por}</div>
                                                 </td>
-                                                <td style={{ padding: '1rem' }}>
+                                                <td style={{ padding: '0.5rem' }} className="hide-on-mobile">
                                                     {editingPagoId === p.id ? (
                                                         <select
                                                             className="form-control"
-                                                            style={{ fontSize: '0.75rem', padding: '0.3rem' }}
+                                                            style={{ fontSize: '0.7rem', padding: '0.2rem' }}
                                                             value={editData.metodo_pago}
                                                             onChange={e => setEditData({ ...editData, metodo_pago: e.target.value })}
                                                         >
@@ -293,7 +293,7 @@ export const Balances: React.FC = () => {
                                                             <option value="MERCADO_PAGO">MERCADO PAGO</option>
                                                         </select>
                                                     ) : (
-                                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ccc' }}>{p.metodo}</span>
+                                                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#ccc' }}>{p.metodo}</span>
                                                     )}
                                                 </td>
                                                 <td style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>
@@ -309,24 +309,24 @@ export const Balances: React.FC = () => {
                                                         <span style={{ fontFamily: 'Anton', fontSize: 'clamp(0.9rem, 4vw, 1.2rem)', color: 'white' }}>${p.monto.toLocaleString()}</span>
                                                     )}
                                                 </td>
-                                                <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                                <td style={{ padding: '0.5rem', textAlign: 'center' }}>
+                                                    <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'center' }}>
                                                         {editingPagoId === p.id ? (
                                                             <>
-                                                                <button onClick={() => handleSaveEdit(p.id)} style={{ background: '#10b981', border: 'none', color: 'white', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                    <Save size={14} />
+                                                                <button onClick={() => handleSaveEdit(p.id)} style={{ background: '#10b981', border: 'none', color: 'white', padding: '0.3rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <Save size={12} />
                                                                 </button>
-                                                                <button onClick={() => setEditingPagoId(null)} style={{ background: '#333', border: 'none', color: 'white', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                    <X size={14} />
+                                                                <button onClick={() => setEditingPagoId(null)} style={{ background: '#333', border: 'none', color: 'white', padding: '0.3rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <X size={12} />
                                                                 </button>
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <button onClick={() => handleStartEdit(p)} style={{ background: 'transparent', border: '1px solid #333', color: '#aaa', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                    <Edit3 size={14} />
+                                                                <button onClick={() => handleStartEdit(p)} style={{ background: 'transparent', border: '1px solid #333', color: '#aaa', padding: '0.3rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <Edit3 size={12} />
                                                                 </button>
-                                                                <button onClick={() => handleDeletePago(p.id)} style={{ background: 'transparent', border: '1px solid #333', color: 'var(--danger-color)', padding: '0.4rem', borderRadius: '2px', cursor: 'pointer' }}>
-                                                                    <Trash2 size={14} />
+                                                                <button onClick={() => handleDeletePago(p.id)} style={{ background: 'transparent', border: '1px solid #333', color: 'var(--danger-color)', padding: '0.3rem', borderRadius: '2px', cursor: 'pointer' }}>
+                                                                    <Trash2 size={12} />
                                                                 </button>
                                                             </>
                                                         )}
@@ -353,9 +353,9 @@ export const Balances: React.FC = () => {
                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead style={{ backgroundColor: '#050505', position: 'sticky', top: 0, zIndex: 10 }}>
                                         <tr style={{ textAlign: 'left', borderBottom: '2px solid #222' }}>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>FECHA / CATEGORÍA</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>DESCRIPCIÓN / RESPONSABLE</th>
-                                            <th style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)' }}>FECHA</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)' }}>DETALLE</th>
+                                            <th style={{ padding: '0.5rem', fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'right' }}>MONTO</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -365,9 +365,9 @@ export const Balances: React.FC = () => {
                                                     <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white' }}>{new Date(g.fecha).toLocaleDateString('es-AR')}</div>
                                                     <div style={{ fontSize: '0.65rem', color: '#ef4444', fontWeight: 800 }}>{g.categoria.toUpperCase()}</div>
                                                 </td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    <div style={{ fontSize: '0.8rem', color: 'white' }}>{g.descripcion || 'Sin descripción'}</div>
-                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>RESP: {g.chofer} | REG: {g.registrado_por}</div>
+                                                <td style={{ padding: '0.5rem' }}>
+                                                    <div style={{ fontSize: '0.75rem', color: 'white' }}>{(g.descripcion || 'Sin desc').toUpperCase()}</div>
+                                                    <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }} className="hide-on-mobile">RESP: {g.chofer} | REG: {g.registrado_por}</div>
                                                 </td>
                                                 <td style={{ padding: '0.75rem 0.5rem', textAlign: 'right', fontFamily: 'Anton', fontSize: 'clamp(0.9rem, 4vw, 1.2rem)', color: 'white' }}>
                                                     -${g.monto.toLocaleString()}
