@@ -82,11 +82,11 @@ export const Logs: React.FC = () => {
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead style={{ backgroundColor: '#050505', borderBottom: '2px solid #222' }}>
                             <tr>
-                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>FECHA / HORA</th>
-                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>USUARIO</th>
-                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>ACCIÓN</th>
-                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>RECURSO</th>
-                                <th style={{ padding: '1rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)' }}>IP</th>
+                                <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }}>FECHA</th>
+                                <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }}>USUARIO</th>
+                                <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }}>ACCIÓN</th>
+                                <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }} className="hide-on-mobile">RECURSO</th>
+                                <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textAlign: 'right' }}>IP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,37 +101,37 @@ export const Logs: React.FC = () => {
                             ) : (
                                 filteredLogs.map(log => (
                                     <tr key={log.id} style={{ borderBottom: '1px solid #111' }}>
-                                        <td style={{ padding: '1rem' }}>
-                                            <div style={{ fontSize: '0.8rem', color: 'white', fontWeight: 600 }}>
-                                                {new Date(log.timestamp + 'Z').toLocaleDateString('es-AR')}
+                                        <td style={{ padding: '0.5rem' }}>
+                                            <div style={{ fontSize: '0.7rem', color: 'white', fontWeight: 600 }}>
+                                                {new Date(log.timestamp + 'Z').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}
                                             </div>
-                                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                <Clock size={10} /> {new Date(log.timestamp + 'Z').toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                                            </div>
-                                        </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', fontWeight: 800, fontSize: '0.8rem' }}>
-                                                <User size={14} color="var(--primary-color)" /> {log.user.toUpperCase()}
+                                            <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                                                <Clock size={8} /> {new Date(log.timestamp + 'Z').toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })}
                                             </div>
                                         </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--primary-color)' }}>{log.accion}</span>
+                                        <td style={{ padding: '0.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'white', fontWeight: 800, fontSize: '0.7rem' }}>
+                                                <User size={12} color="var(--primary-color)" /> {log.user.toUpperCase()}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '0.5rem' }}>
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary-color)' }}>{log.accion}</span>
                                             {log.detalles && (
-                                                <div style={{ fontSize: '0.6rem', color: '#999', marginTop: '0.4rem', background: '#111', padding: '0.4rem', borderRadius: '4px' }}>
-                                                    {Object.entries(log.detalles).map(([k, v]) => (
-                                                        <div key={k} style={{ display: 'flex', gap: '0.3rem' }}>
+                                                <div style={{ fontSize: '0.55rem', color: '#999', marginTop: '0.2rem', background: '#111', padding: '0.2rem', borderRadius: '4px' }} className="hide-on-mobile">
+                                                    {Object.entries(log.detalles).slice(0, 2).map(([k, v]) => (
+                                                        <div key={k} style={{ display: 'flex', gap: '0.2rem' }}>
                                                             <span style={{ fontWeight: 700, textTransform: 'uppercase' }}>{k}:</span>
-                                                            <span>{String(v)}</span>
+                                                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{String(v)}</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             )}
                                         </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <div style={{ fontSize: '0.75rem', color: 'white', fontWeight: 600 }}>{log.recurso.toUpperCase()}</div>
-                                            {log.recurso_id && <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>ID: #{log.recurso_id}</div>}
+                                        <td style={{ padding: '0.5rem' }} className="hide-on-mobile">
+                                            <div style={{ fontSize: '0.7rem', color: 'white', fontWeight: 600 }}>{log.recurso.toUpperCase()}</div>
+                                            {log.recurso_id && <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>ID: #{log.recurso_id}</div>}
                                         </td>
-                                        <td className="ip-column" style={{ padding: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                                        <td className="ip-column" style={{ padding: '0.5rem', fontSize: 'clamp(0.6rem, 2.5vw, 0.7rem)', color: 'var(--text-muted)', fontFamily: 'monospace', textAlign: 'right' }}>
                                             {log.ip || '---'}
                                         </td>
                                     </tr>

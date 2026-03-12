@@ -194,16 +194,16 @@ export const Balances: React.FC = () => {
                             <TrendingUp size={20} color="var(--primary-color)" /> FILTROS
                         </h3>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2rem' }}>
-                            <div className="form-group">
-                                <label className="form-label" style={{ color: 'var(--text-muted)' }}>DESDE</label>
-                                <input type="date" className="form-control" value={dates.desde} onChange={e => setDates({ ...dates, desde: e.target.value })} />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>DESDE</label>
+                                <input type="date" className="form-control" style={{ fontSize: '0.8rem', padding: '0.5rem' }} value={dates.desde} onChange={e => setDates({ ...dates, desde: e.target.value })} />
                             </div>
-                            <div className="form-group">
-                                <label className="form-label" style={{ color: 'var(--text-muted)' }}>HASTA</label>
-                                <input type="date" className="form-control" value={dates.hasta} onChange={e => setDates({ ...dates, hasta: e.target.value })} />
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>HASTA</label>
+                                <input type="date" className="form-control" style={{ fontSize: '0.8rem', padding: '0.5rem' }} value={dates.hasta} onChange={e => setDates({ ...dates, hasta: e.target.value })} />
                             </div>
-                            <button className="btn btn-primary btn-block" onClick={fetchData}>ACTUALIZAR RESUMEN</button>
+                            <button className="btn btn-primary btn-block" style={{ gridColumn: '1 / -1', marginTop: '0.5rem' }} onClick={fetchData}>ACTUALIZAR RESUMEN</button>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
