@@ -49,7 +49,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 minHeight: '100vh',
                 position: 'relative',
                 transition: 'margin-left 0.3s ease',
-                overflowX: 'hidden',
                 maxWidth: '100vw'
             }} className="mobile-full-width mobile-padding-sm">
                 {children}

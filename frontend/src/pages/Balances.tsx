@@ -296,7 +296,7 @@ export const Balances: React.FC = () => {
                                                         <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ccc' }}>{p.metodo}</span>
                                                     )}
                                                 </td>
-                                                <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                <td style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>
                                                     {editingPagoId === p.id ? (
                                                         <input
                                                             type="number"
@@ -306,7 +306,7 @@ export const Balances: React.FC = () => {
                                                             onChange={e => setEditData({ ...editData, monto: Number(e.target.value) })}
                                                         />
                                                     ) : (
-                                                        <span style={{ fontFamily: 'Anton', fontSize: '1.2rem', color: 'white' }}>${p.monto.toLocaleString()}</span>
+                                                        <span style={{ fontFamily: 'Anton', fontSize: 'clamp(0.9rem, 4vw, 1.2rem)', color: 'white' }}>${p.monto.toLocaleString()}</span>
                                                     )}
                                                 </td>
                                                 <td style={{ padding: '1rem', textAlign: 'center' }}>
@@ -369,7 +369,7 @@ export const Balances: React.FC = () => {
                                                     <div style={{ fontSize: '0.8rem', color: 'white' }}>{g.descripcion || 'Sin descripción'}</div>
                                                     <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>RESP: {g.chofer} | REG: {g.registrado_por}</div>
                                                 </td>
-                                                <td style={{ padding: '1rem', textAlign: 'right', fontFamily: 'Anton', fontSize: '1.2rem', color: 'white' }}>
+                                                <td style={{ padding: '0.75rem 0.5rem', textAlign: 'right', fontFamily: 'Anton', fontSize: 'clamp(0.9rem, 4vw, 1.2rem)', color: 'white' }}>
                                                     -${g.monto.toLocaleString()}
                                                 </td>
                                             </tr>
