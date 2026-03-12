@@ -152,10 +152,11 @@ export const Dashboard: React.FC = () => {
                 borderRadius: '4px',
                 borderLeft: '6px solid var(--primary-color)',
                 position: 'relative',
-                border: '1px solid #222'
-            }}>
-                <h1 style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1, color: 'white' }}>PANEL DE CONTROL</h1>
-                <p style={{ color: 'white', fontWeight: 800, marginTop: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '1rem', fontFamily: 'Anton' }}>
+                border: '1px solid #222',
+                overflow: 'hidden'
+            }} className="mobile-padding-sm">
+                <h1 style={{ fontSize: 'clamp(1.8rem, 8vw, 2.5rem)', margin: 0, lineHeight: 1, color: 'white' }}>PANEL DE CONTROL</h1>
+                <p style={{ color: 'white', fontWeight: 800, marginTop: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.9rem', fontFamily: 'Anton' }}>
                     EL <span style={{ color: 'var(--primary-color)' }}>SERRANO SERVICIOS</span>
                 </p>
                 <div style={{ position: 'absolute', top: '1rem', right: '1rem', opacity: 0.1 }} className="hide-on-mobile">
@@ -164,7 +165,12 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {/* Stat Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
+                gap: '1rem', 
+                marginBottom: '2rem' 
+            }} className="mobile-grid-2">
                 {cards.map((card, i) => (
                     <div
                         key={i}
@@ -188,8 +194,8 @@ export const Dashboard: React.FC = () => {
                                 <card.icon size={20} />
                             </div>
                         </div>
-                        <h3 style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 800 }}>{card.title}</h3>
-                        <p style={{ fontSize: '2rem', color: 'white', fontFamily: 'Anton', margin: 0 }}>{card.value}</p>
+                        <h3 style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 800 }}>{card.title}</h3>
+                        <p style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', color: 'white', fontFamily: 'Anton', margin: 0 }}>{card.value}</p>
                     </div>
                 ))}
             </div>

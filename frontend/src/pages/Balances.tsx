@@ -130,11 +130,21 @@ export const Balances: React.FC = () => {
 
     return (
         <div style={{ padding: '0 1rem', paddingBottom: '5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '3rem', background: 'rgba(255, 84, 0, 0.05)', padding: '1.5rem', borderRadius: '4px', border: '1px solid #222' }}>
-                <Wallet size={40} color="var(--primary-color)" />
+            <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '1.5rem', 
+                marginBottom: '3rem', 
+                background: 'rgba(255, 84, 0, 0.05)', 
+                padding: '1.5rem', 
+                borderRadius: '4px', 
+                border: '1px solid #222',
+                overflow: 'hidden'
+            }} className="mobile-stack">
+                <Wallet size={40} color="var(--primary-color)" className="hide-on-mobile" />
                 <div>
-                    <h1 className="heading-brand" style={{ fontSize: '2.5rem', margin: 0, color: 'white', lineHeight: 1 }}>BALANCES Y FINANZAS</h1>
-                    <p style={{ color: 'var(--primary-color)', fontWeight: 800, letterSpacing: '0.1em', marginTop: '0.25rem' }}>CONTROL ECONÓMICO V2.0</p>
+                    <h1 className="heading-brand" style={{ fontSize: 'clamp(1.8rem, 8vw, 2.5rem)', margin: 0, color: 'white', lineHeight: 1 }}>BALANCES Y FINANZAS</h1>
+                    <p style={{ color: 'var(--primary-color)', fontWeight: 800, letterSpacing: '0.1em', marginTop: '0.25rem', fontSize: '0.8rem' }}>CONTROL ECONÓMICO V2.0</p>
                 </div>
             </div>
 

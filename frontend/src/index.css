@@ -36,6 +36,7 @@
   padding: 0;
 }
 
+html,
 body {
   background-color: var(--background-dark);
   background-image: var(--grunge-overlay);
@@ -44,6 +45,8 @@ body {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   letter-spacing: -0.01em;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 h1,
@@ -266,7 +269,13 @@ aside {
 .responsive-grid-cards {
   display: grid;
   gap: 2rem;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+@media (max-width: 480px) {
+  .responsive-grid-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 @media (max-width: 768px) {
   .responsive-grid-cards {

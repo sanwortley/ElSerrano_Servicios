@@ -145,10 +145,11 @@ export const HojasDeRuta: React.FC = () => {
                 padding: '2rem',
                 borderRadius: '4px',
                 borderLeft: '8px solid var(--primary-color)',
-                border: '1px solid #222'
-            }}>
-                <h1 style={{ fontSize: '3rem', margin: 0, lineHeight: 0.9, color: 'white', fontFamily: 'Anton' }}>HOJA DE RUTA</h1>
-                <p style={{ color: 'var(--primary-color)', fontWeight: 800, marginTop: '0.5rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '1.2rem' }}>
+                border: '1px solid #222',
+                overflow: 'hidden'
+            }} className="mobile-padding-sm mobile-stack">
+                <h1 style={{ fontSize: 'clamp(2rem, 10vw, 3rem)', margin: 0, lineHeight: 0.9, color: 'white', fontFamily: 'Anton' }}>HOJA DE RUTA</h1>
+                <p style={{ color: 'var(--primary-color)', fontWeight: 800, marginTop: '0.5rem', letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: 'clamp(0.8rem, 4vw, 1.2rem)' }}>
                     CONSTRUCCIÓN Y OPTIMIZACIÓN MANUAL
                 </p>
             </div>

@@ -48,7 +48,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 width: 'calc(100% - var(--sidebar-width))',
                 minHeight: '100vh',
                 position: 'relative',
-                transition: 'margin-left 0.3s ease'
+                transition: 'margin-left 0.3s ease',
+                overflowX: 'hidden',
+                maxWidth: '100vw'
             }} className="mobile-full-width mobile-padding-sm">
                 {children}
             </main>
