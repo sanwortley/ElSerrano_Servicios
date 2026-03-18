@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
-import { Menu, X, Home } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,13 +22,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 padding: '0 1rem',
                 zIndex: 1000
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <button 
-                        onClick={() => window.location.href = '/'}
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                    >
-                        <Home size={18} />
-                    </button>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                     <span style={{ fontFamily: 'Anton', fontSize: '1.2rem', color: 'white' }}>EL SERRANO</span>
                 </div>
                 <button 
