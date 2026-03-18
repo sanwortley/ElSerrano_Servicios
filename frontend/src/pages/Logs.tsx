@@ -78,7 +78,7 @@ export const Logs: React.FC = () => {
             </div>
 
             <div className="card" style={{ padding: 0, overflow: 'hidden', backgroundColor: '#000', border: '1px solid #222' }}>
-                <div className="table-container">
+                <div className="table-container" style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead style={{ backgroundColor: '#050505', borderBottom: '2px solid #222' }}>
                             <tr>
@@ -131,7 +131,7 @@ export const Logs: React.FC = () => {
                                             <div style={{ fontSize: '0.7rem', color: 'white', fontWeight: 600 }}>{log.recurso.toUpperCase()}</div>
                                             {log.recurso_id && <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>ID: #{log.recurso_id}</div>}
                                         </td>
-                                        <td className="ip-column" style={{ padding: '0.5rem', fontSize: 'clamp(0.6rem, 2.5vw, 0.7rem)', color: 'var(--text-muted)', fontFamily: 'monospace', textAlign: 'right' }}>
+                                        <td className="ip-column" style={{ padding: '0.5rem', fontSize: 'clamp(0.6rem, 2.5vw, 0.7rem)', color: 'var(--text-muted)', fontFamily: 'monospace', textAlign: 'right', whiteSpace: 'nowrap' }}>
                                             {log.ip || '---'}
                                         </td>
                                     </tr>
