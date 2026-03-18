@@ -85,7 +85,7 @@ export const Logs: React.FC = () => {
                                 <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }}>FECHA</th>
                                 <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }}>USUARIO</th>
                                 <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }}>ACCIÓN</th>
-                                <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }} className="hide-on-mobile">RECURSO</th>
+                                <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)' }}>RECURSO</th>
                                 <th style={{ padding: '0.5rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textAlign: 'right' }}>IP</th>
                             </tr>
                         </thead>
@@ -127,7 +127,7 @@ export const Logs: React.FC = () => {
                                                 </div>
                                             )}
                                         </td>
-                                        <td style={{ padding: '0.5rem' }} className="hide-on-mobile">
+                                        <td style={{ padding: '0.5rem' }}>
                                             <div style={{ fontSize: '0.7rem', color: 'white', fontWeight: 600 }}>{log.recurso.toUpperCase()}</div>
                                             {log.recurso_id && <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>ID: #{log.recurso_id}</div>}
                                         </td>
