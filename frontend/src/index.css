@@ -310,6 +310,7 @@ aside {
     white-space: normal !important;
   }
   .table-container table td.ip-column {
-    word-break: break-all !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
   }
 }
