@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Truck, CheckCircle, Navigation, Phone, RefreshCcw } from 'lucide-react';
 import api from '../api/axios';
+import { RouteMap } from '../components/RouteMap';
 
 interface DriverData {
     fecha: string;
@@ -133,6 +134,20 @@ export const ChoferPanel: React.FC = () => {
                     </p>
                 </div>
             </div>
+
+            {/* Map View */}
+            {allServices.some(s => s.lat !== null && s.lng !== null) && (
+                <div style={{ marginBottom: '3rem' }}>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.5rem' }}>Mapa de Ruta</p>
+                    <RouteMap items={allServices.map(s => ({
+                        id: s.id,
+                        lat: s.lat,
+                        lng: s.lng,
+                        cliente: s.cliente?.nombre || 'Cliente',
+                        direccion: s.direccion
+                    }))} />
+                </div>
+            )}
 
             <div style={{ display: 'grid', gap: '2rem' }}>
                 {allServices.length === 0 ? (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, Save, Wand2 } from 'lucide-react';
 import api from '../api/axios';
+import { RouteMap } from '../components/RouteMap';
 
 interface RouteItem {
     id: number;
@@ -189,72 +190,85 @@ export const HojasDeRuta: React.FC = () => {
                 </div>
 
                 <div>
-                    <div className="card" style={{ padding: 0, background: '#000' }}>
-                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 className="heading-brand" style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>SECUENCIA DE RUTA</h3>
-                            <button
-                                className="btn btn-primary"
-                                style={{ padding: '0.5rem 2rem' }}
-                                onClick={handleSave}
-                                disabled={saving || items.length === 0}
-                            >
-                                <Save size={18} /> {saving ? 'GUARDANDO...' : 'GUARDAR ORDEN'}
-                            </button>
-                        </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)', gap: '2rem' }} className="mobile-stack">
+                        <div className="card" style={{ padding: 0, background: '#000', height: 'fit-content' }}>
+                            <div style={{ padding: '1.5rem', borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h3 className="heading-brand" style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>SECUENCIA DE RUTA</h3>
+                                <button
+                                    className="btn btn-primary"
+                                    style={{ padding: '0.5rem 2rem' }}
+                                    onClick={handleSave}
+                                    disabled={saving || items.length === 0}
+                                >
+                                    <Save size={18} /> {saving ? 'GUARDANDO...' : 'GUARDAR ORDEN'}
+                                </button>
+                            </div>
 
-                        <div style={{ minHeight: '400px' }}>
-                            {items.length === 0 ? (
-                                <div style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: 800 }}>
-                                    NO HAY TAREAS ASIGNADAS O PENDIENTES
-                                </div>
-                            ) : (
-                                <div style={{ padding: '1rem' }}>
-                                    {items.map((item, idx) => (
-                                        <div key={`${item.tipo}-${item.id}`} style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '1rem',
-                                            padding: '1rem',
-                                            background: '#050505',
-                                            border: '1px solid #222',
-                                            marginBottom: '0.5rem',
-                                            borderRadius: '4px'
-                                        }}>
-                                            <div style={{
-                                                width: '40px',
-                                                height: '40px',
-                                                background: 'var(--primary-color)',
-                                                borderRadius: '50%',
+                            <div style={{ minHeight: '400px' }}>
+                                {items.length === 0 ? (
+                                    <div style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: 800 }}>
+                                        NO HAY TAREAS ASIGNADAS O PENDIENTES
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: '1rem' }}>
+                                        {items.map((item, idx) => (
+                                            <div key={`${item.tipo}-${item.id}`} style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontFamily: 'Anton',
-                                                color: 'white',
-                                                fontSize: '1.2rem'
+                                                gap: '1rem',
+                                                padding: '1rem',
+                                                background: '#050505',
+                                                border: '1px solid #222',
+                                                marginBottom: '0.5rem',
+                                                borderRadius: '4px'
                                             }}>
-                                                {idx + 1}
-                                            </div>
-
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                                    <span style={{ fontSize: '0.6rem', padding: '0.1rem 0.4rem', borderRadius: '2px', background: item.tipo === 'P' ? '#3b82f6' : '#8b5cf6', color: 'white', fontWeight: 800 }}>
-                                                        {item.tipo === 'P' ? 'INSTANTÁNEO' : 'ABONO'}
-                                                    </span>
-                                                    <p style={{ margin: 0, fontWeight: 800, color: 'white', textTransform: 'uppercase' }}>{(item.cliente || 'SIN NOMBRE').toUpperCase()}</p>
+                                                <div style={{
+                                                    width: '40px',
+                                                    height: '40px',
+                                                    background: 'var(--primary-color)',
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontFamily: 'Anton',
+                                                    color: 'white',
+                                                    fontSize: '1.2rem'
+                                                }}>
+                                                    {idx + 1}
                                                 </div>
-                                                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.direccion}</p>
-                                            </div>
 
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                                <button className="btn btn-secondary" style={{ padding: '0.2rem' }} onClick={() => move(idx, 'up')} disabled={idx === 0}>
-                                                    <ChevronUp size={20} />
-                                                </button>
-                                                <button className="btn btn-secondary" style={{ padding: '0.2rem' }} onClick={() => move(idx, 'down')} disabled={idx === items.length - 1}>
-                                                    <ChevronDown size={20} />
-                                                </button>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                                        <span style={{ fontSize: '0.6rem', padding: '0.1rem 0.4rem', borderRadius: '2px', background: item.tipo === 'P' ? '#3b82f6' : '#8b5cf6', color: 'white', fontWeight: 800 }}>
+                                                            {item.tipo === 'P' ? 'INSTANTÁNEO' : 'ABONO'}
+                                                        </span>
+                                                        <p style={{ margin: 0, fontWeight: 800, color: 'white', textTransform: 'uppercase' }}>{(item.cliente || 'SIN NOMBRE').toUpperCase()}</p>
+                                                    </div>
+                                                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.direccion}</p>
+                                                </div>
+
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                                    <button className="btn btn-secondary" style={{ padding: '0.2rem' }} onClick={() => move(idx, 'up')} disabled={idx === 0}>
+                                                        <ChevronUp size={20} />
+                                                    </button>
+                                                    <button className="btn btn-secondary" style={{ padding: '0.2rem' }} onClick={() => move(idx, 'down')} disabled={idx === items.length - 1}>
+                                                        <ChevronDown size={20} />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            {items.some(s => s.lat !== null && s.lng !== null) && (
+                                <div className="card" style={{ padding: '1.5rem', background: '#000', minHeight: '400px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                    <h3 className="heading-brand" style={{ color: 'white', marginBottom: '1.5rem', fontSize: '1.2rem' }}>VISTA DE MAPA</h3>
+                                    <div style={{ flex: 1, minHeight: '350px' }}>
+                                        <RouteMap items={items} height="100%" />
+                                    </div>
                                 </div>
                             )}
                         </div>

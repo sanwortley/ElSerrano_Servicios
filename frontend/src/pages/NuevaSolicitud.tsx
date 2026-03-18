@@ -383,17 +383,18 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
                     <form onSubmit={handleCreateSolicitud}>
                         <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                             <label className="form-label" style={{ color: 'var(--text-muted)' }}>SERVICIO</label>
-                            <select
+                             <select
                                 className="form-control"
                                 value={formData.tipo_servicio}
                                 onChange={(e) => setFormData({ ...formData, tipo_servicio: e.target.value })}
                             >
-                                <option value="Volquetes y contenedores para obra">ALQUILER DE VOLQUETE / OBRA</option>
-                                <option value="Venta de áridos, piedras y rellenos">VENTA DE ÁRIDOS / PIEDRA</option>
-                                <option value="Desagotes y destapes de cañerías">DESAGOTES / DESTAPES</option>
-                                <option value="Alquiler de baños químicos">ALQUILER DE BAÑO QUÍMICO</option>
-                                <option value="Movimiento de suelo">MOVIMIENTO DE SUELO</option>
-                                <option value="Alquiler de obradores">ALQUILER DE OBRADORES</option>
+                                <option value="Volquetes (Grandes y Chicos)">ALQUILER DE VOLQUETES</option>
+                                <option value="Desagotes (Pozos, Cámaras, Sangrías)">DESAGOTES</option>
+                                <option value="Destape de Cañerías">DESTAPE DE CAÑERÍAS</option>
+                                <option value="Alquiler de Obradores y Casillas">ALQUILER DE OBRADORES Y CASILLAS</option>
+                                <option value="Alquiler de Baños Químicos">ALQUILER DE BAÑO QUÍMICO</option>
+                                <option value="Movimiento de Suelo / Cavado de Piletas">MOVIMIENTO DE SUELO / PILETAS</option>
+                                <option value="Venta de Áridos (Granza, Escombro)">VENTA DE ÁRIDOS</option>
                                 <option value="Otros">OTROS</option>
                             </select>
                         </div>

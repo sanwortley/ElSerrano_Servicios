@@ -34,12 +34,13 @@ interface AddressSuggestion {
 }
 
 const TIPOS_SERVICIO = [
-    "Desagotes y destapes de cañerías",
-    "Movimiento de suelo",
-    "Venta de áridos, piedras y rellenos",
-    "Volquetes y contenedores para obra",
-    "Alquiler de obradores",
-    "Alquiler de baños químicos",
+    "Volquetes (Grandes y Chicos)",
+    "Desagotes (Pozos, Cámaras, Sangrías)",
+    "Destape de Cañerías",
+    "Alquiler de Obradores y Casillas",
+    "Alquiler de Baños Químicos",
+    "Movimiento de Suelo / Cavado de Piletas",
+    "Venta de Áridos (Granza, Escombro)",
     "Otros"
 ];
 
@@ -54,7 +55,7 @@ export const Frecuentes: React.FC = () => {
         nombre_cliente: '',
         telefono: '',
         direccion: '',
-        tipo_servicio: TIPOS_SERVICIO[5], // Default: Baños
+        tipo_servicio: TIPOS_SERVICIO[4], // Default: Baños
         cantidad: 1,
         costo_individual: 0,
         fecha_inicio: '',

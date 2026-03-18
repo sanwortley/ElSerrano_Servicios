@@ -8,11 +8,14 @@ test('Flujo completo: Login Admin -> Crear Solicitud -> Login Chofer -> Registra
   await page.getByRole('button', { name: 'ENTRAR AL SISTEMA' }).click();
 
   // Verificar que entramos al Dashboard
-  await expect(page.getByRole('link', { name: 'Nueva Solicitud' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Servicios Individuales' })).toBeVisible();
 
   // 2. Crear una Nueva Solicitud (Desde Servicios Individuales)
   await page.getByRole('link', { name: 'Servicios Individuales' }).click();
   await page.getByRole('button', { name: 'NUEVA SOLICITUD' }).click();
+
+  // Seleccionar cliente existente (necesario para habilitar el botón de confirmación)
+  await page.getByText('JOSE PEREZ').first().click();
 
   // Seleccionar servicio (usamos index 1 que suele ser el primero disponible)
   await page.locator('select').first().selectOption({ index: 1 });

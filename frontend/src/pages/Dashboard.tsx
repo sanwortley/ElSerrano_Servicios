@@ -398,7 +398,9 @@ export const Dashboard: React.FC = () => {
                     <PaymentModal
                         pedidoId={selectedPedido.id}
                         clienteNombre={selectedPedido.cliente?.nombre || 'CLIENTE'}
-                        montoSugerido={selectedPedido.costo}
+                        montoSugerido={selectedPedido.monto_reportado || selectedPedido.costo}
+                        metodoSugerido={selectedPedido.metodo_reportado}
+                        observaciones={selectedPedido.observaciones_chofer}
                         onClose={() => setSelectedPedido(null)}
                         onSuccess={fetchData}
                     />
@@ -410,16 +412,23 @@ export const Dashboard: React.FC = () => {
                     <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
                         <div style={{ background: '#000', border: '2px solid #333', padding: '2rem', width: '100%', maxWidth: '500px' }}>
                             <h2 className="heading-brand" style={{ fontSize: '1.5rem', color: 'white', marginBottom: '1.5rem' }}>COBRAR ABONO</h2>
-                            <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>CLIENTE: <span style={{ color: 'white', fontWeight: 800 }}>{selectedAbono.cliente?.nombre.toUpperCase()}</span></p>
+                            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>CLIENTE: <span style={{ color: 'white', fontWeight: 800 }}>{selectedAbono.cliente?.nombre.toUpperCase()}</span></p>
+
+                            {selectedAbono.observaciones_chofer && (
+                                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(255, 84, 0, 0.05)', borderRadius: '4px', border: '1px solid #222', borderLeft: '4px solid var(--primary-color)' }}>
+                                    <p style={{ fontSize: '0.6rem', color: 'var(--primary-color)', fontWeight: 800, margin: '0 0 0.25rem 0' }}>AVISO DEL CHOFER</p>
+                                    <p style={{ margin: 0, color: 'white', fontSize: '0.8rem', fontStyle: 'italic' }}>"{selectedAbono.observaciones_chofer}"</p>
+                                </div>
+                            )}
 
                             <div className="form-group" style={{ marginBottom: '1.5rem' }}>
                                 <label className="form-label" style={{ color: 'var(--text-muted)' }}>MONTO A COBRAR ($)</label>
-                                <input type="number" id="abono-charge-amount" className="form-control" defaultValue={selectedAbono.total} />
+                                <input type="number" id="abono-charge-amount" className="form-control" defaultValue={selectedAbono.monto_reportado || selectedAbono.total} />
                             </div>
 
                             <div className="form-group" style={{ marginBottom: '2rem' }}>
                                 <label className="form-label" style={{ color: 'var(--text-muted)' }}>MÉTODO DE PAGO</label>
-                                <select id="abono-charge-method" className="form-control">
+                                <select id="abono-charge-method" className="form-control" defaultValue={selectedAbono.metodo_reportado || "EFECTIVO"}>
                                     <option value="EFECTIVO">EFECTIVO</option>
                                     <option value="TRANSFERENCIA">TRANSFERENCIA</option>
                                     <option value="TARJETA">TARJETA</option>

@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
-import { Truck, Droplets, Trash2, Send, Phone, MapPin, Mountain, Home, Hammer, Lock, Menu, X } from 'lucide-react';
+import { Truck, Droplets, Trash2, Send, Phone, Mountain, Home, Hammer, Lock, Menu, X, Mail, Instagram } from 'lucide-react';
 import api from '../api/axios';
+
+const WhatsAppIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
+    </svg>
+);
 
 export const PortalCliente: React.FC = () => {
     const [phoneSearch, setPhoneSearch] = useState('');
@@ -133,7 +139,7 @@ export const PortalCliente: React.FC = () => {
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Tu teléfono (ej: 351...)"
+                            placeholder="Tu teléfono (ej: 3546...)"
                             style={{ height: '3.5rem', fontSize: '1rem', backgroundColor: '#111', color: '#fff' }}
                             value={phoneSearch}
                             onChange={(e) => setPhoneSearch(e.target.value)}
@@ -184,12 +190,12 @@ export const PortalCliente: React.FC = () => {
                     <h2 style={{ textAlign: 'center', marginBottom: '3rem', fontFamily: 'Anton' }}>Nuestros Servicios</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
                         {[
-                            { icon: Droplets, title: 'Desagotes y Destapes', desc: 'Desagotes y destapes de cañerías con equipos de alta potencia.' },
-                            { icon: Hammer, title: 'Movimiento de Suelo', desc: 'Nivelación, excavación y limpieza de terrenos.' },
-                            { icon: Mountain, title: 'Venta de Áridos', desc: 'Piedras, arena, rellenos y materiales para la construcción.' },
-                            { icon: Truck, title: 'Volquetes', desc: 'Volquetes y contenedores para obra de diversos tamaños.' },
-                            { icon: Home, title: 'Obradores', desc: 'Alquiler de módulos habitacionales y obradores móviles.' },
-                            { icon: Trash2, title: 'Baños Químicos', desc: 'Alquiler de baños químicos para obras y eventos.' },
+                            { icon: Droplets, title: 'Desagotes y Destapes', desc: 'Desagotes de pozos, cámaras, sangrías, etc. Destape de cañerías.' },
+                            { icon: Truck, title: 'Volquetes', desc: 'Volquetes grandes y chicos para obras y limpieza.' },
+                            { icon: Home, title: 'Obradores y Casillas', desc: 'Obradores para obras, casillas de vigilancia, habitables y boleterías.' },
+                            { icon: Trash2, title: 'Baños Químicos', desc: 'Alquiler de baños químicos para eventos y obras.' },
+                            { icon: Hammer, title: 'Movimiento de Suelo', desc: 'Nivelación, excavación de piletas y limpieza de terrenos.' },
+                            { icon: Mountain, title: 'Venta de Áridos', desc: 'Envíos de áridos, granzas, escombros y materiales.' },
                         ].map((s, idx) => (
                             <div key={idx} className="card card-instagram" style={{ padding: '2rem', transition: 'all 0.3s ease', cursor: 'default', backgroundColor: 'var(--surface-dark)' }}>
                                 <div style={{ color: 'var(--primary-color)', marginBottom: '1.2rem' }}>
@@ -210,20 +216,76 @@ export const PortalCliente: React.FC = () => {
                         <h2 style={{ marginBottom: '1.2rem', lineHeight: 1, fontFamily: 'Anton' }}>Solicitá tu <br /><span style={{ color: 'var(--primary-color)' }}>Presupuesto</span></h2>
                         <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', marginBottom: '2.5rem' }}>Completa el formulario y un asesor se contactará con vos en menos de una hora.</p>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                            {/* WhatsApp / Celular */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ background: 'rgba(255,84,0,0.1)', padding: '0.8rem', borderRadius: '10px' }}>
-                                    <Phone size={24} color="var(--primary-color)" />
+                                <a 
+                                    href="https://wa.me/5493546403242" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    style={{ background: 'rgba(37, 211, 102, 0.1)', color: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '45px', height: '45px', borderRadius: '10px', textDecoration: 'none', transition: 'all 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'}
+                                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <WhatsAppIcon />
+                                </a>
+                                <div>
+                                    <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>WhatsApp / Celular</div>
+                                    <a href="tel:3546403242" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.95rem' }}>3546-403242</a>
                                 </div>
-                                <div><div style={{ fontWeight: 800, color: '#fff' }}>Llamanos</div><div style={{ color: 'var(--text-muted)' }}>351 755-2167</div></div>
                             </div>
+
+                            {/* Teléfono Fijo */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ background: 'rgba(255,84,0,0.1)', padding: '0.8rem', borderRadius: '10px' }}>
-                                    <MapPin size={24} color="var(--primary-color)" />
+                                <a 
+                                    href="tel:03546421937" 
+                                    style={{ background: 'rgba(255, 84, 0, 0.1)', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '45px', height: '45px', borderRadius: '10px', textDecoration: 'none', transition: 'all 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'}
+                                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <Phone size={22} />
+                                </a>
+                                <div>
+                                    <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teléfono Fijo</div>
+                                    <a href="tel:03546421937" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.95rem' }}>03546-421937</a>
                                 </div>
-                                <div><div style={{ fontWeight: 800, color: '#fff' }}>Ubicación</div><div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Córdoba Capital y Alrededores</div></div>
+                            </div>
+
+                            {/* Email */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <a 
+                                    href="mailto:elserranoservicios@gmail.com" 
+                                    style={{ background: 'rgba(255, 84, 0, 0.1)', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '45px', height: '45px', borderRadius: '10px', textDecoration: 'none', transition: 'all 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'}
+                                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <Mail size={22} />
+                                </a>
+                                <div>
+                                    <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</div>
+                                    <a href="mailto:elserranoservicios@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.95rem' }}>elserranoservicios@gmail.com</a>
+                                </div>
+                            </div>
+
+                            {/* Instagram */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <a 
+                                    href="https://instagram.com/elserranoservicioss" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    style={{ background: 'rgba(255, 84, 0, 0.1)', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '45px', height: '45px', borderRadius: '10px', textDecoration: 'none', transition: 'all 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'}
+                                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <Instagram size={22} />
+                                </a>
+                                <div>
+                                    <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Instagram</div>
+                                    <a href="https://instagram.com/elserranoservicioss" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none', fontSize: '0.95rem' }}>@elserranoservicioss</a>
+                                </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div className="mobile-padding-sm" style={{ background: 'var(--surface-dark)', padding: '2.5rem', borderRadius: '0px', border: '2px solid white', boxShadow: '10px 10px 0px rgba(0,0,0,0.5)' }}>
@@ -253,12 +315,13 @@ export const PortalCliente: React.FC = () => {
                                 <div className="form-group">
                                     <label style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>SERVICIO DE INTERÉS</label>
                                     <select className="form-control" value={quoteData.tipo_servicio} onChange={e => setQuoteData({ ...quoteData, tipo_servicio: e.target.value })} style={{ backgroundColor: '#000', color: '#fff' }}>
-                                        <option>Volquetes y contenedores para obra</option>
-                                        <option>Desagotes y destapes de cañerías</option>
-                                        <option>Movimiento de suelo</option>
-                                        <option>Venta de áridos, piedras y rellenos</option>
-                                        <option>Alquiler de obradores</option>
-                                        <option>Alquiler de baños químicos</option>
+                                        <option>Volquetes (Grandes y Chicos)</option>
+                                        <option>Desagotes (Pozos, Cámaras, Sangrías)</option>
+                                        <option>Destape de Cañerías</option>
+                                        <option>Alquiler de Obradores y Casillas</option>
+                                        <option>Alquiler de Baños Químicos</option>
+                                        <option>Movimiento de Suelo / Cavado de Piletas</option>
+                                        <option>Venta de Áridos (Granza, Escombro)</option>
                                         <option>Otros</option>
                                     </select>
                                 </div>
