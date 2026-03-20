@@ -29,9 +29,12 @@ async def detect_zone(
     if not (lat and lng):
         return {"zona": None, "msg": "Ubicación no encontrada", "lat": lat, "lng": lng}
     
-    zona_id = await find_zone_for_point(lat, lng, db)
+    zona_id, debug_info = await find_zone_for_point(lat, lng, db, detailed=True)
     if not zona_id:
-        return {"zona": None, "msg": "Fuera de zona operativa"}
+        msg = "Fuera de zona operativa"
+        if debug_info and debug_info.get("closest_zone") and debug_info.get("distance_meters") is not None:
+             msg = f"Fuera de zona. A {debug_info['distance_meters']}m de la zona '{debug_info['closest_zone']}'."
+        return {"zona": None, "msg": msg, "debug": debug_info}
     
     stmt = select(Zona).where(Zona.id == zona_id)
     result = await db.execute(stmt)

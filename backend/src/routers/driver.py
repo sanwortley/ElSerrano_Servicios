@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated, List, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_, and_, cast, Date
 from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 from src.db import get_db
@@ -31,7 +31,7 @@ async def list_choferes(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[Usuario, Depends(get_current_active_user)]
 ):
-    from src.models.users import Chofer
+    from src.models.users import Chofer, Usuario
     stmt = select(Chofer).options(selectinload(Chofer.usuario))
     result = await db.execute(stmt)
     return result.scalars().all()
@@ -87,6 +87,14 @@ async def get_driver_today(
     stmt_ped = select(PedidoIndividual)\
         .where(
             PedidoIndividual.chofer_id == current_user.chofer_perfil.id,
+            or_(
+                cast(PedidoIndividual.fecha_hora_ejecucion, Date) == today.date(),
+                PedidoIndividual.fecha_hora_ejecucion == None,
+                and_(
+                    cast(PedidoIndividual.fecha_hora_ejecucion, Date) < today.date(),
+                    PedidoIndividual.estado.not_in([EstadoPedido.COMPLETADA, EstadoPedido.FINALIZADO])
+                )
+            ),
             PedidoIndividual.estado.in_([
                 EstadoPedido.CREADA, 
                 EstadoPedido.ASIGNADA, 
@@ -110,7 +118,7 @@ async def get_driver_today(
     stmt_freq = select(ServicioFrecuente)\
         .where(
             ServicioFrecuente.chofer_id == current_user.chofer_perfil.id,
-            ServicioFrecuente.estado.in_([EstadoFrecuente.ACTIVO, EstadoFrecuente.COMPLETADA])
+            ServicioFrecuente.estado.in_([EstadoFrecuente.ACTIVO, EstadoFrecuente.COMPLETADA, EstadoFrecuente.EN_CAMINO])
         )\
         .options(
             selectinload(ServicioFrecuente.cliente), 
@@ -310,18 +318,14 @@ async def delete_chofer(
     if not chofer:
         raise HTTPException(status_code=404, detail="Chofer no encontrado")
     
-    # Identify the user associated with this chofer
-    user_id = chofer.usuario_id
-    
-    # Delete Chofer profile
-    await db.delete(chofer)
-    
-    # Delete the user associated
-    stmt_user = select(Usuario).where(Usuario.id == user_id)
+    # Soft delete: de-activate associated user to maintain references in history
+    stmt_user = select(Usuario).where(Usuario.id == chofer.usuario_id)
     res_user = await db.execute(stmt_user)
     user = res_user.scalar_one_or_none()
-    if user:
-        await db.delete(user)
     
-    await db.commit()
-    return {"ok": True, "msg": "Chofer y usuario eliminados"}
+    if user:
+        user.activo = False
+        await db.commit()
+        return {"ok": True, "msg": "Chofer desvinculado con éxito"}
+    else:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")

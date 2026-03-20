@@ -277,12 +277,15 @@ export const Zonas: React.FC = () => {
             <div className="responsive-grid-cards">
                 {zonas.map(zona => (
                     <div key={zona.id} className="card" style={{ backgroundColor: '#000', border: '1px solid #222', padding: '2rem', position: 'relative' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                             <div>
                                 <h3 className="heading-brand" style={{ fontSize: '1.8rem', color: 'white', margin: 0, lineHeight: 1 }}>{zona.nombre}</h3>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
                                     <span style={{ width: '8px', height: '8px', background: 'var(--primary-color)', borderRadius: '50%' }}></span>
                                     <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>ÁREA CONFIGURADA</span>
+                                    <span className={`badge ${zona.polygon_geojson.includes('"Polygon"') || zona.polygon_geojson.includes('"MultiPolygon"') ? 'badge-success' : 'badge-danger'}`} style={{ fontSize: '0.6rem', marginLeft: '0.5rem' }}>
+                                        {zona.polygon_geojson.includes('"Polygon"') || zona.polygon_geojson.includes('"MultiPolygon"') ? 'POLÍGONO' : 'PUNTO'}
+                                    </span>
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>

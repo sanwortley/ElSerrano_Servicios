@@ -28,6 +28,7 @@ class EstadoPedido(str, Enum):
 class EstadoFrecuente(str, Enum):
     ACTIVO = "ACTIVO"
     PAUSADO = "PAUSADO"
+    EN_CAMINO = "EN_CAMINO"
     COMPLETADA = "COMPLETADA"
     FINALIZADO = "FINALIZADO"
     PAGO_PENDIENTE = "PAGO_PENDIENTE"

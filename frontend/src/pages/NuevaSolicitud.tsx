@@ -24,6 +24,7 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
     const [showNewClienteForm, setShowNewClienteForm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState({ type: '', text: '' });
+    const [zonas, setZonas] = useState<any[]>([]);
 
     // New Solicitud Form
     const [formData, setFormData] = useState({
@@ -63,11 +64,12 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
 
     const fetchClientes = async () => {
         try {
-            const [cRes] = await Promise.all([
+            const [cRes, zRes] = await Promise.all([
                 api.get('/clientes/'),
                 api.get('/zonas/')
             ]);
             setClientes(cRes.data);
+            setZonas(zRes.data);
         } catch (err) {
             console.error("Error fetching data", err);
         }
@@ -605,6 +607,7 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
                     initialLng={suggestionContext === 'solicitud' ? formData.lng : newClienteData.lng}
                     onClose={() => setShowMapPicker(false)}
                     onSelect={handleMapSelect}
+                    zones={zonas}
                 />
             )}
         </div>

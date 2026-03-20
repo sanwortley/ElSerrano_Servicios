@@ -9,6 +9,7 @@ interface Chofer {
     usuario: {
         nombre: string;
         email: string;
+        activo: boolean;
     };
     zona_gastos?: string;
 }
@@ -87,7 +88,7 @@ export const Choferes: React.FC = () => {
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm('¿Está seguro de eliminar este chofer? Se eliminará también su usuario de acceso.')) return;
+        if (!window.confirm('¿Está seguro de desvincular este chofer? Podrá seguir visualizándose en el historial de trabajos.')) return;
         try {
             await api.delete(`/chofer/${id}`);
             fetchChoferes();
@@ -121,9 +122,9 @@ export const Choferes: React.FC = () => {
                 <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--text-muted)', fontWeight: 800 }}>CARGANDO...</div>
             ) : (
                 <div className="responsive-grid-cards">
-                    {choferes.map(chofer => (
+                    {choferes.filter(c => c.usuario.activo).map(chofer => (
                         <div key={chofer.id} className="card card-instagram" style={{ backgroundColor: '#0A0A0A', border: '1px solid #333' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
                                 <div style={{
                                     width: '64px', height: '64px',
                                     backgroundColor: '#111',
@@ -141,14 +142,14 @@ export const Choferes: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="responsive-grid-2" style={{ gap: '1.5rem', background: '#050505', padding: '1.5rem', borderRadius: '4px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: '#050505', padding: '1.5rem', borderRadius: '4px' }}>
                                 <div>
                                     <p style={{ fontSize: '0.7rem', color: 'var(--primary-color)', fontWeight: 800, margin: '0 0 0.25rem 0' }}>PATENTE / UNIDAD</p>
-                                    <p style={{ margin: 0, color: 'white', fontWeight: 700, fontSize: '1.1rem', fontFamily: 'Anton' }}>{chofer.patente.toUpperCase()}</p>
+                                    <p style={{ margin: 0, color: 'white', fontWeight: 700, fontSize: '1.1rem', fontFamily: 'Anton', wordBreak: 'break-all' }}>{chofer.patente.toUpperCase()}</p>
                                 </div>
                                 <div>
                                     <p style={{ fontSize: '0.7rem', color: 'var(--primary-color)', fontWeight: 800, margin: '0 0 0.25rem 0' }}>WHATSAPP</p>
-                                    <p style={{ margin: 0, color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>{chofer.telefono}</p>
+                                    <p style={{ margin: 0, color: 'white', fontWeight: 700, fontSize: '1.1rem', wordBreak: 'break-all' }}>{chofer.telefono}</p>
                                 </div>
                             </div>
 

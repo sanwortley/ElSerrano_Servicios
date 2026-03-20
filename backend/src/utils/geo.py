@@ -94,7 +94,7 @@ async def get_lat_lng(address: str, db: AsyncSession):
     return None, None
 
 
-async def find_zone_for_point(lat: float, lng: float, db: AsyncSession):
+async def find_zone_for_point(lat: float, lng: float, db: AsyncSession, detailed: bool = False):
     point = Point(lng, lat) # Shapely uses (x, y) = (lng, lat)
     
     # Get all active zones
@@ -106,6 +106,9 @@ async def find_zone_for_point(lat: float, lng: float, db: AsyncSession):
     # 0.00005 is roughly 5 meters
     PRECISION_BUFFER = 0.00005
 
+    closest_zone = None
+    min_distance_meters = float('inf')
+
     for zone in zones:
         try:
             poly_geojson = json.loads(zone.polygon_geojson)
@@ -113,11 +116,29 @@ async def find_zone_for_point(lat: float, lng: float, db: AsyncSession):
             
             # Use buffer for more robust intersection at edges
             if poly_shape.buffer(PRECISION_BUFFER).contains(point):
+                if detailed:
+                    return zone.id, None
                 return zone.id
+            
+            # Distance calculation for debugging
+            # Shapely distance is in degrees. Approx 1 deg = 111,000 meters
+            dist_deg = poly_shape.distance(point)
+            dist_meters = dist_deg * 111000 # Rough approx
+            if dist_meters < min_distance_meters:
+                min_distance_meters = dist_meters
+                closest_zone = zone.nombre
+
         except Exception as e:
             print(f"Error checking zone {zone.id}: {e}")
             continue
             
+    if detailed:
+        debug_info = {
+            "closest_zone": closest_zone,
+            "distance_meters": int(min_distance_meters) if min_distance_meters != float('inf') else None
+        }
+        return None, debug_info
+
     return None
 
 async def get_locality_boundary(locality_name: str):

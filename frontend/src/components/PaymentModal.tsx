@@ -10,9 +10,10 @@ interface PaymentModalProps {
     onSuccess: () => void;
     metodoSugerido?: string;
     observaciones?: string;
+    tipo?: 'pedidos' | 'frecuentes';
 }
 
-export const PaymentModal: React.FC<PaymentModalProps> = ({ pedidoId, montoSugerido, clienteNombre, onClose, onSuccess, metodoSugerido, observaciones }) => {
+export const PaymentModal: React.FC<PaymentModalProps> = ({ pedidoId, montoSugerido, clienteNombre, onClose, onSuccess, metodoSugerido, observaciones, tipo }) => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         monto: montoSugerido,
@@ -23,8 +24,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ pedidoId, montoSuger
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post(`/pedidos/${pedidoId}/pagos`, formData);
-            alert('Pago registrado con éxito. El pedido ha sido completado.');
+            const endpoint = tipo === 'frecuentes' ? `/frecuentes/${pedidoId}/pagos` : `/pedidos/${pedidoId}/pagos`;
+            await api.post(endpoint, formData);
+            alert('Pago registrado con éxito.');
             onSuccess();
             onClose();
         } catch (err: any) {

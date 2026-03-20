@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import { X, Check } from 'lucide-react';
 
@@ -22,9 +22,10 @@ interface MapPickerProps {
     initialLng?: number | null;
     onSelect: (lat: number, lng: number) => void;
     onClose: () => void;
+    zones?: any[];
 }
 
-export const MapPicker: React.FC<MapPickerProps> = ({ initialLat, initialLng, onSelect, onClose }) => {
+export const MapPicker: React.FC<MapPickerProps> = ({ initialLat, initialLng, onSelect, onClose, zones }) => {
     const [position, setPosition] = useState<[number, number] | null>(
         initialLat && initialLng ? [initialLat, initialLng] : [-31.9774, -64.5714] // Default center (VGB area)
     );
@@ -69,6 +70,25 @@ export const MapPicker: React.FC<MapPickerProps> = ({ initialLat, initialLng, on
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
                         <LocationMarker />
+                        {zones && zones.map(z => {
+                            try {
+                                const geojson = JSON.parse(z.polygon_geojson);
+                                return (
+                                    <GeoJSON 
+                                        key={z.id} 
+                                        data={geojson} 
+                                        style={{ 
+                                            color: '#10b981', 
+                                            fillColor: '#10b981', 
+                                            fillOpacity: 0.15, 
+                                            weight: 2 
+                                        }} 
+                                    />
+                                );
+                            } catch (e) {
+                                return null;
+                            }
+                        })}
                     </MapContainer>
                 </div>
 

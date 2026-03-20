@@ -164,7 +164,7 @@ async def get_gastos_recientes(
         "monto": g.monto,
         "categoria": g.categoria,
         "descripcion": g.descripcion,
-        "chofer": g.chofer.usuario.nombre if g.chofer else "Admin",
+        "chofer": (g.chofer.usuario.nombre + (" (DESVINC.)" if not g.chofer.usuario.activo else "")) if g.chofer else "Admin",
         "registrado_por": g.registrador.nombre
     } for g in gastos]
 
@@ -298,7 +298,7 @@ async def get_driver_work_sessions(
     res = []
     for s in sessions:
         read_obj = SesionTrabajoRead.model_validate(s)
-        read_obj.chofer_nombre = s.chofer.usuario.nombre
+        read_obj.chofer_nombre = s.chofer.usuario.nombre + (" (DESVINCULADO)" if not s.chofer.usuario.activo else "")
         res.append(read_obj)
         
     return res

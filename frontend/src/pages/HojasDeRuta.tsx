@@ -168,7 +168,7 @@ export const HojasDeRuta: React.FC = () => {
                         >
                             <option value="">-- SELECCIONAR --</option>
                             {choferes.map(c => (
-                                <option key={c.id} value={c.id}>{c.usuario.nombre.toUpperCase()}</option>
+                                <option key={c.id} value={c.id} disabled={c.usuario.activo === false}>{c.usuario.nombre.toUpperCase()}{c.usuario.activo === false ? ' (DESVINCULADO)' : ''}</option>
                             ))}
                         </select>
                     </div>

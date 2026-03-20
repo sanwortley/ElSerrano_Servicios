@@ -12,7 +12,7 @@ interface ServicioFrecuente {
     fecha_fin: string;
     dias_semana: string[];
     dia_saliente?: string;
-    estado: 'ACTIVO' | 'PAUSADO' | 'PAGO_PENDIENTE' | 'COMPLETADA' | 'FINALIZADO';
+    estado: 'ACTIVO' | 'PAUSADO' | 'PAGO_PENDIENTE' | 'COMPLETADA' | 'FINALIZADO' | 'EN_CAMINO';
     total: number;
     monto_reportado?: number;
     metodo_reportado?: string;
@@ -70,6 +70,7 @@ export const Frecuentes: React.FC = () => {
     const [selectedClienteId, setSelectedClienteId] = useState<number | null>(null);
     const [detectedZone, setDetectedZone] = useState<any>(null);
     const [zoneMsg, setZoneMsg] = useState('');
+    const [zonas, setZonas] = useState<any[]>([]);
 
     // Suggestions
     const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([]);
@@ -79,13 +80,14 @@ export const Frecuentes: React.FC = () => {
     const fetchServices = async () => {
         try {
             setLoading(true);
-            const [servRes, , choferesRes, clientesRes] = await Promise.all([
+            const [servRes, zRes, choferesRes, clientesRes] = await Promise.all([
                 api.get('/frecuentes/'),
                 api.get('/zonas/'),
                 api.get('/chofer/choferes'),
                 api.get('/clientes/')
             ]);
             setServices(servRes.data);
+            setZonas(zRes.data);
             setAllChoferes(choferesRes.data);
             setAllClientes(clientesRes.data);
         } catch (err) {
@@ -327,15 +329,15 @@ export const Frecuentes: React.FC = () => {
                 <div className="responsive-grid-cards">
                     {filteredServices.map((service) => (
                         <div key={service.id} className="card card-instagram" style={{ backgroundColor: '#0A0A0A', border: '1px solid #333', position: 'relative' }}>
-                            <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
-                                <span className={`badge ${service.estado === 'ACTIVO' ? 'badge-primary' : 'badge-warning'}`}>
-                                    {service.estado}
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                                <span className={`badge ${service.estado === 'ACTIVO' ? 'badge-primary' : 'badge-warning'}`} style={{ fontSize: '0.65rem' }}>
+                                    {service.estado.replace('_', ' ')}
                                 </span>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', color: 'var(--primary-color)' }}>
-                                <Star size={28} fill="var(--primary-color)" />
-                                <h3 className="heading-brand" style={{ fontSize: '1.4rem', color: 'white', margin: 0 }}>{(service.tipo_servicio || "S/D").toUpperCase()}</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', color: 'var(--primary-color)' }}>
+                                <Star size={24} fill="var(--primary-color)" style={{ flexShrink: 0 }} />
+                                <h3 className="heading-brand" style={{ fontSize: '1.3rem', color: 'white', margin: 0, lineHeight: 1.1 }}>{(service.tipo_servicio || "S/D").toUpperCase()}</h3>
                             </div>
 
                             <div style={{ display: 'grid', gap: '1.25rem' }}>
@@ -382,7 +384,9 @@ export const Frecuentes: React.FC = () => {
                                     >
                                         <option value="">SIN ASIGNAR</option>
                                         {allChoferes.map(c => (
-                                            <option key={c.id} value={c.id}>{c.usuario.nombre.toUpperCase()}</option>
+                                            <option key={c.id} value={c.id} disabled={!c.usuario.activo}>
+                                                {c.usuario.nombre.toUpperCase()} {!c.usuario.activo ? ' (DESVINCULADO)' : ''}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
@@ -624,6 +628,7 @@ export const Frecuentes: React.FC = () => {
                     observaciones={selectedService.observaciones_chofer}
                     onClose={() => setSelectedService(null)}
                     onSuccess={fetchServices}
+                    tipo="frecuentes"
                 />
             )}
 
@@ -633,6 +638,7 @@ export const Frecuentes: React.FC = () => {
                     initialLng={formData.lng}
                     onClose={() => setShowMapPicker(false)}
                     onSelect={handleMapSelect}
+                    zones={zonas}
                 />
             )}
         </div>
