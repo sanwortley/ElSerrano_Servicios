@@ -306,7 +306,7 @@ export const Dashboard: React.FC = () => {
                                     <p style={{ margin: 0, fontSize: '0.65rem', color: 'var(--text-muted)' }}>#{p.id} | {p.tipo_servicio}</p>
                                 </div>
                                 <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem', minWidth: '80px' }}>
-                                    <span style={{ fontFamily: 'Anton', color: activeTab === 'history' ? '#666' : 'var(--primary-color)', fontSize: '0.9rem' }}>${p.costo.toLocaleString()}</span>
+                                    <span style={{ fontFamily: 'Anton', color: activeTab === 'history' ? '#666' : 'var(--primary-color)', fontSize: '0.9rem' }}>{p.rango_precio ? p.rango_precio : `$${p.costo.toLocaleString()}`}</span>
                                     {activeTab === 'active' && (
                                         <button
                                             onClick={() => setSelectedPedido(p)}

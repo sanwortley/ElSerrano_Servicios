@@ -22,6 +22,32 @@ async def get_lat_lng(address: str, db: AsyncSession):
     if cached:
         return cached.lat, cached.lng
 
+    # Custom Zonas check: if the address matches a Barrio Privado/Zona
+    stmt_zones = select(Zona).where(Zona.activo == True)
+    res_zones = await db.execute(stmt_zones)
+    zones = res_zones.scalars().all()
+    
+    query_norm_text = ' '.join([w for w in address_norm.replace("barrio", "").replace("privado", "").replace("lote", "").replace("country", "").replace(",", "").split() if not w.isnumeric()])
+    if len(query_norm_text) > 3:
+        for z in zones:
+            z_norm = z.nombre.lower().replace("barrio", "").replace("privado", "").replace("country", "").strip()
+            if len(z_norm) > 3 and z_norm in query_norm_text:
+                try:
+                    s = shape(json.loads(z.polygon_geojson))
+                    centroid = s.centroid
+                    new_cache = GeocodeCache(
+                        query_hash=query_hash,
+                        direccion_normalizada=address_norm,
+                        lat=centroid.y,
+                        lng=centroid.x,
+                        raw_json={"source": "zona_centroid", "zone": z.nombre}
+                    )
+                    db.add(new_cache)
+                    await db.commit()
+                    return centroid.y, centroid.x
+                except Exception as e:
+                    pass
+
     # Fetch from Nominatim
     async with httpx.AsyncClient() as client:
         try:
@@ -232,7 +258,7 @@ async def search_addresses(query: str, db: AsyncSession):
             zone_shapes = []
             for z in zones:
                 try:
-                    zone_shapes.append(shape(json.loads(z.polygon_geojson)))
+                    zone_shapes.append((z, shape(json.loads(z.polygon_geojson))))
                 except:
                     continue
 
@@ -243,6 +269,25 @@ async def search_addresses(query: str, db: AsyncSession):
             if num_match:
                 query_number = num_match.group(1)
 
+            # Custom Zonas check: if the query matches a Zona name, add its centroid
+            query_norm = query.lower().replace("barrio", "").replace("privado", "").replace("lote", "").replace("country", "").replace(",", "").strip()
+            query_norm_text = ' '.join([w for w in query_norm.split() if not w.isnumeric()])
+
+            if len(query_norm_text) > 3:
+                for z, s in zone_shapes:
+                    z_norm = z.nombre.lower().replace("barrio", "").replace("privado", "").replace("country", "").strip()
+                    if len(z_norm) > 3 and z_norm in query_norm_text:
+                        centroid = s.centroid
+                        display_name = f"{z.nombre}"
+                        if query_number:
+                            display_name = f"Lote {query_number}, {z.nombre}"
+                        suggestions.append({
+                            "display_name": f"{display_name} (Barrio Privado)",
+                            "lat": centroid.y,
+                            "lng": centroid.x,
+                            "city": "ZONA EL SERRANO"
+                        })
+
             for item in data:
                 lat = float(item["lat"])
                 lng = float(item["lon"])
@@ -250,7 +295,7 @@ async def search_addresses(query: str, db: AsyncSession):
                 
                 # Check if point is inside ANY of our zones (with buffer)
                 is_inside = False
-                for s in zone_shapes:
+                for z, s in zone_shapes:
                     if s.buffer(0.0001).contains(point): # 10m buffer for suggestions
                         is_inside = True
                         break

@@ -97,7 +97,9 @@ async def create_frecuente(
         fecha_inicio=f_inicio,
         fecha_fin=f_fin,
         dias_semana=frecuente.dias_semana,
-        orden_en_ruta=frecuente.orden_en_ruta
+        orden_en_ruta=frecuente.orden_en_ruta,
+        rango_horario=frecuente.rango_horario,
+        rango_precio=frecuente.rango_precio
     )
     db.add(new_freq)
     try:
@@ -174,6 +176,8 @@ async def update_frecuente(
     db_freq.dias_semana = frec_upd.dias_semana
     db_freq.dia_saliente = frec_upd.dia_saliente
     db_freq.orden_en_ruta = frec_upd.orden_en_ruta
+    db_freq.rango_horario = frec_upd.rango_horario
+    db_freq.rango_precio = frec_upd.rango_precio
     
     await db.commit()
     await db.refresh(db_freq)

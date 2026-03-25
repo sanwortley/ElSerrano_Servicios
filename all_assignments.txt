@@ -1,0 +1,8 @@
+=== ALL CHOFERES ===
+ID: 1, User: Rodrigo Petero, UsuarioID: 6
+
+=== ALL PEDIDOS INDIVIDUALES ===
+ID: 1, Cliente: Juan Perez, Chofer: Rodrigo Petero (ID Chofer: 1), Estado: EstadoPedido.COMPLETADA
+
+=== ALL SERVICIOS FRECUENTES ===
+ID: 1, Cliente: Juan Perez, Chofer: Rodrigo Petero (ID Chofer: 1), Estado: EstadoFrecuente.ACTIVO, Días: ['Lunes', 'Viernes']

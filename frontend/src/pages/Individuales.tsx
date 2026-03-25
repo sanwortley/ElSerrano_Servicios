@@ -23,6 +23,8 @@ interface Pedido {
     monto_reportado?: number;
     metodo_reportado?: string;
     observaciones_chofer?: string;
+    rango_horario?: string;
+    rango_precio?: string;
 }
 
 export const Individuales: React.FC = () => {
@@ -183,12 +185,12 @@ export const Individuales: React.FC = () => {
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
                                                 <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, margin: 0 }}>COBRO</p>
-                                                <p style={{ margin: 0, color: 'white', fontFamily: 'Anton', fontSize: '1.5rem' }}>${p.costo.toLocaleString()}</p>
+                                                <p style={{ margin: 0, color: 'white', fontFamily: 'Anton', fontSize: '1.5rem' }}>{p.rango_precio ? p.rango_precio : `$${p.costo.toLocaleString()}`}</p>
                                             </div>
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #111' }}>
                                             <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-color)', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                                                <Clock size={14} /> {p.fecha_hora_ejecucion ? new Date(p.fecha_hora_ejecucion).toLocaleString('es-AR') : 'PENDIENTE'}
+                                                <Clock size={14} /> {p.rango_horario ? p.rango_horario : (p.fecha_hora_ejecucion ? new Date(p.fecha_hora_ejecucion).toLocaleString('es-AR') : 'PENDIENTE')}
                                             </p>
                                             {p.zona && (
                                                 <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', textAlign: 'right', justifyContent: 'flex-end' }}>

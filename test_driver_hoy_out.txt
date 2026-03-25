@@ -1,0 +1,4 @@
+﻿DEBUG HOY: User Rodrigo Petero, Profile ID 1
+DEBUG HOY: Found 1 individual pedidos for chofer 1
+DEBUG HOY: Found 1 frequent services for chofer 1
+DEBUG: Chofer Rodrigo Petero (ID 1) -> Pedidos: 1, Frecuentes: 0

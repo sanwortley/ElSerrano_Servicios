@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Security & Database Integrity Report</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #0d0d12;
+            --accent: #3b82f6;
+            /* Electric Blue */
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --text: #ffffff;
+            --text-dim: #888891;
+            --code-bg: #16161a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 50px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 50px;
+            border-radius: 20px;
+            border: 1px solid #1a1a23;
+        }
+
+        header {
+            border-left: 4px solid var(--accent);
+            padding-left: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .banner {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            border: 1px solid #222;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin: 40px 0 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: '>';
+            color: var(--accent);
+            margin-right: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #121216;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #1e1e26;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #a5b4fc;
+            border: 1px solid #222;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-dim);
+            font-size: 12px;
+            border-top: 1px solid #1a1a23;
+            padding-top: 30px;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: #050505 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                background: #0d0d12 !important;
+                box-shadow: none;
+                border: none;
+                padding: 40px;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            h1 {
+                color: #ffffff !important;
+            }
+
+            .subtitle,
+            p,
+            h2 {
+                color: #888891 !important;
+            }
+
+            .card {
+                background: #121216 !important;
+                border: 1px solid #1e1e26 !important;
+            }
+
+            @page {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Security & Data Integrity Architecture</h1>
+            <div class="subtitle">BUILDING SECURE CLOUD APPLICATIONS BY DEFAULT</div>
+        </header>
+
+        <img src="security_banner.png" alt="Security Map" class="banner">
+
+        <p style="color: var(--text-dim);">When I build a backend, security isn't an afterthought. It's the foundation.
+            Here's a technical breakdown of the protection layers I implement in every FastAPI/PostgreSQL project.</p>
+
+        <h2>1. Access Control</h2>
+        <div class="feature-grid">
+            <div class="card">
+                <h3>JWT (JSON Web Tokens)</h3>
+                <p>Stateless authentication with custom expiration logic. Prevents session hijacking and ensures secure
+                    communication between the frontend and the API.</p>
+            </div>
+            <div class="card">
+                <h3>Rate Limiting</h3>
+                <p>Automatic protection against Brute-Force attacks. My APIs automatically block suspicious IP behaviors
+                    to prevent unauthorized access attempts.</p>
+            </div>
+        </div>
+
+        <h2>2. Data Accountability</h2>
+        <div class="card" style="width: 100%;">
+            <h3>Automated Action Audit Logs</h3>
+            <p>I implement a full traceability system. Every 'Create', 'Update', or 'Delete' action is recorded with a
+                timestamp, IP, and User ID. Never lose track of what happened in your database.</p>
+            <div class="code-block">
+                # Sample Audit Entry Structure<br>
+                { "action": "UPDATE_ORDER", "user": "admin@user.com", "timestamp": "2024-03-04T10:08", "status":
+                "SUCCESS" }
+            </div>
+        </div>
+
+        <h2>3. Database Health</h2>
+        <div class="feature-grid" style="margin-top: 20px;">
+            <div class="card">
+                <h3>Relational Integrity</h3>
+                <p>Using PostGIS for complex location-based data and SQLAlchemy for ORM mapping, ensuring data
+                    consistency across all tables.</p>
+            </div>
+            <div class="card">
+                <h3>Automated Migrations</h3>
+                <p>Full control over database versions using Alembic. This allows for zero-downtime updates and easy
+                    data restoration.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            Built with Secure Development Lifecycle (SDL) Principles.
+        </div>
+    </div>
+</body>
+
+</html>

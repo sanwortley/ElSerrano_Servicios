@@ -136,16 +136,37 @@ export const ChoferPanel: React.FC = () => {
             </div>
 
             {/* Map View */}
-            {allServices.some(s => s.lat !== null && s.lng !== null) && (
+            {allServices.some(s => s.lat !== null && s.lng !== null && s.estado !== 'COMPLETADA') && (
                 <div style={{ marginBottom: '3rem' }}>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.5rem' }}>Mapa de Ruta</p>
-                    <RouteMap items={allServices.map(s => ({
-                        id: s.id,
-                        lat: s.lat,
-                        lng: s.lng,
-                        cliente: s.cliente?.nombre || 'Cliente',
-                        direccion: s.direccion
-                    }))} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', margin: 0 }}>Mapa de Ruta</p>
+                        <button 
+                            className="btn btn-primary"
+                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.65rem' }}
+                            onClick={() => {
+                                const valid = allServices.filter(s => s.lat !== null && s.lng !== null && s.estado !== 'COMPLETADA');
+                                if (valid.length === 0) return;
+                                const dest = valid[valid.length - 1];
+                                const waypoints = valid.slice(0, -1).map(s => `${s.lat},${s.lng}`).join('|');
+                                const url = `https://www.google.com/maps/dir/?api=1&origin=-32.079573,-64.530513&destination=${dest.lat},${dest.lng}${waypoints ? '&waypoints=' + encodeURIComponent(waypoints) : ''}&travelmode=driving`;
+                                window.open(url, '_blank');
+                            }}
+                        >
+                            <Navigation size={14} /> NAVEGAR RUTA EN GOOGLE MAPS
+                        </button>
+                    </div>
+                    <RouteMap items={allServices
+                        .map((s, idx) => ({ ...s, displayIndex: idx + 1 }))
+                        .filter(s => s.estado !== 'COMPLETADA')
+                        .map(s => ({
+                            id: s.id,
+                            lat: s.lat,
+                            lng: s.lng,
+                            cliente: s.cliente?.nombre || 'Cliente',
+                            direccion: s.direccion,
+                            displayIndex: s.displayIndex
+                        }))
+                    } />
                 </div>
             )}
 
@@ -383,11 +404,16 @@ const OrderCard: React.FC<{ service: any; onUpdate: () => void; index: number; o
                     <p style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>
                         <Phone size={18} /> {service.cliente.telefono || service.telefono}
                     </p>
+                    {(service.rango_horario || service.fecha_hora_ejecucion) && (
+                        <p style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--primary-color)', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>
+                            ⏰ {service.rango_horario ? service.rango_horario : new Date(service.fecha_hora_ejecucion).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </p>
+                    )}
                 </div>
                 <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 800, marginBottom: '0.25rem' }}>COBRO</p>
                     <p style={{ fontSize: '2rem', color: 'white', fontFamily: 'Anton', margin: 0 }}>
-                        ${(service.costo || service.costo_individual || 0).toLocaleString()}
+                        {service.rango_precio ? service.rango_precio : `$${(service.costo || service.costo_individual || 0).toLocaleString()}`}
                     </p>
                 </div>
             </div>

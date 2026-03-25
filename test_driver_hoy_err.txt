@@ -1,0 +1,101 @@
+﻿DEBUG HOY: User Rodrigo Petero, Profile ID 1
+DEBUG HOY: Found 1 individual pedidos for chofer 1
+DEBUG HOY: Found 1 frequent services for chofer 1
+DEBUG: Chofer Rodrigo Petero (ID 1) -> Pedidos: 1, Frecuentes: 0
+python : Traceback (most 
+recent call last):
+En línea: 1 Carácter: 28
++ ... HONPATH="backend"; 
+python backend/src/test_driv
+er_hoy.py 2>&1 | Out-F ...
++                        ~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          
+    : NotSpecified: (Trace  
+  back (most recent call    
+ last)::String) [], Remo    
+teException
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+  File "C:\ElSerranoServicio
+s\backend\src\test_driver_ho
+y.py", line 37, in <module>
+    asyncio.run(test_driver_
+hoy())
+    ~~~~~~~~~~~^^^^^^^^^^^^^
+^^^^^^
+  File "C:\Users\santi\AppDa
+ta\Local\Programs\Python\Pyt
+hon313\Lib\asyncio\runners.p
+y", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\santi\AppDa
+ta\Local\Programs\Python\Pyt
+hon313\Lib\asyncio\runners.p
+y", line 118, in run
+    return self._loop.run_un
+til_complete(task)
+           ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~^^^^^^
+  File "C:\Users\santi\AppDa
+ta\Local\Programs\Python\Pyt
+hon313\Lib\asyncio\base_even
+ts.py", line 725, in 
+run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\ElSerranoServicio
+s\backend\src\test_driver_ho
+y.py", line 22, in 
+test_driver_hoy
+    response = await 
+get_driver_today(db, user)
+               ^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+  File "C:\ElSerranoServicio
+s\backend\src\routers\driver
+.py", line 146, in 
+get_driver_today
+    return 
+DriverTodayResponse(
+        fecha=today.strftime
+("%Y-%m-%d"),
+    ...<3 lines>...
+        
+frecuentes=sorted_frecuentes
+    )
+  File "C:\Users\santi\AppDa
+ta\Local\Programs\Python\Pyt
+hon313\Lib\site-packages\pyd
+antic\main.py", line 212, 
+in __init__
+    validated_self = self.__
+pydantic_validator__.validat
+e_python(data, 
+self_instance=self)
+pydantic_core._pydantic_core
+.ValidationError: 1 
+validation error for 
+DriverTodayResponse
+pedidos.0.pagos
+  Error extracting 
+attribute: MissingGreenlet: 
+greenlet_spawn has not been 
+called; can't call 
+await_only() here. Was IO 
+attempted in an unexpected 
+place? (Background on this 
+error at: https://sqlalche.m
+e/e/20/xd2s) 
+[type=get_attribute_error, i
+nput_value=<src.models.busin
+ess.Pedi...t at 
+0x0000011098121BE0>, 
+input_type=PedidoIndividual]
+    For further information 
+visit https://errors.pydanti
+c.dev/2.9/v/get_attribute_er
+ror

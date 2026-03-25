@@ -142,6 +142,8 @@ class PedidoBase(BaseModel):
     lat: Optional[float] = None
     lng: Optional[float] = None
     orden_en_ruta: Optional[int] = None
+    rango_horario: Optional[str] = None
+    rango_precio: Optional[str] = None
 
     @field_validator('fecha_hora_ejecucion', mode='after')
     @classmethod
@@ -189,6 +191,8 @@ class FrecuenteBase(BaseModel):
     lng: Optional[float] = None
     orden_en_ruta: Optional[int] = None
     zona_id: Optional[int] = None
+    rango_horario: Optional[str] = None
+    rango_precio: Optional[str] = None
 
     @field_validator('fecha_inicio', 'fecha_fin', mode='after')
     @classmethod

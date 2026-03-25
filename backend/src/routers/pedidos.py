@@ -62,7 +62,9 @@ async def create_pedido(
         fecha_hora_ejecucion=exec_date,
         recepcionista_id=current_user.id,
         orden_en_ruta=pedido.orden_en_ruta,
-        estado=initial_status
+        estado=initial_status,
+        rango_horario=pedido.rango_horario,
+        rango_precio=pedido.rango_precio
     )
     
     db.add(new_pedido)
@@ -189,6 +191,8 @@ async def update_pedido(
     db_pedido.costo = pedido_upd.costo
     db_pedido.fecha_hora_ejecucion = pedido_upd.fecha_hora_ejecucion.replace(tzinfo=None) if pedido_upd.fecha_hora_ejecucion else None
     db_pedido.orden_en_ruta = pedido_upd.orden_en_ruta
+    db_pedido.rango_horario = pedido_upd.rango_horario
+    db_pedido.rango_precio = pedido_upd.rango_precio
     
     await db.commit()
     await db.refresh(db_pedido)

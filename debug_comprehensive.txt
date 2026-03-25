@@ -1,0 +1,11 @@
+Chofer: Rodrigo Petero (ID Perfil: 1, ID Usuario: 6)
+
+--- Pedidos Individuales Asignados (1) ---
+ID: 1, Estado: EstadoPedido.COMPLETADA, Cliente: Juan Perez, Direccion: El Cedro 49, Villa General Belgrano, Municipio de Villa General Belgrano, Pedanía Los Reartes, Departamento Calamuchita, Córdoba, X5194, Argentina
+
+--- Servicios Frecuentes Asignados (1) ---
+Hoy es: Domingo
+ID: 1, Estado: EstadoFrecuente.ACTIVO, Días: ['Lunes', 'Viernes'], Cliente: Juan Perez, ¿Toca hoy?: False
+
+--- ÚLTIMOS 5 PEDIDOS CREADOS (PARA VER SI ESTÁN ASIGNADOS) ---
+ID: 1, Cliente: Juan Perez, Chofer: Rodrigo Petero, Estado: EstadoPedido.COMPLETADA

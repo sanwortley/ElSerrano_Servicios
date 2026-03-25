@@ -11,7 +11,8 @@ import {
     LogOut,
     Map,
     Shield,
-    Home
+    Home,
+    X
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -72,14 +73,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         SERVICIOS
                     </h1>
                 </div>
-                <button 
-                    onClick={() => window.location.href = '/'} 
-                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center', transition: 'color 0.2s' }}
-                    onMouseEnter={e => e.currentTarget.style.color = 'white'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-                >
-                    <Home size={18} />
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                        onClick={() => window.location.href = '/'} 
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center', transition: 'color 0.2s' }}
+                        onMouseEnter={e => e.currentTarget.style.color = 'white'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                    >
+                        <Home size={18} />
+                    </button>
+                    {isMobile && (
+                        <button 
+                            onClick={onClose} 
+                            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center' }}
+                        >
+                            <X size={24} color="var(--primary-color)" />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Navigation */}

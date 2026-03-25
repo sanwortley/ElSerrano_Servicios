@@ -36,7 +36,9 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
         fecha_hora_ejecucion: new Date().toISOString().slice(0, 16),
         zona_id: null as number | null,
         lat: null as number | null,
-        lng: null as number | null
+        lng: null as number | null,
+        rango_horario: '',
+        rango_precio: ''
     });
 
     const [detectedZone, setDetectedZone] = useState<any>(null);
@@ -57,6 +59,8 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
         lng: null as number | null
     });
 
+    const [useExactTime, setUseExactTime] = useState(true);
+    const [useExactPrice, setUseExactPrice] = useState(true);
 
     useEffect(() => {
         fetchClientes();
@@ -172,8 +176,9 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
         try {
             await api.post('/pedidos/', {
                 ...formData,
+                fecha_hora_ejecucion: formData.fecha_hora_ejecucion ? formData.fecha_hora_ejecucion : null,
                 cliente_id: Number(selectedCliente.id),
-                costo: Number(formData.costo)
+                costo: formData.rango_precio && !formData.costo ? 0 : Number(formData.costo)
             });
             setMsg({ type: 'success', text: 'SOLICITUD CREADA CON ÉXITO' });
             setFormData({
@@ -185,8 +190,12 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
                 fecha_hora_ejecucion: new Date().toISOString().slice(0, 16),
                 zona_id: null,
                 lat: null,
-                lng: null
+                lng: null,
+                rango_horario: '',
+                rango_precio: ''
             });
+            setUseExactTime(true);
+            setUseExactPrice(true);
             setSelectedCliente(null);
             setSearchTerm('');
             if (onSuccess) onSuccess();
@@ -466,27 +475,60 @@ export const NuevaSolicitud: React.FC<{ onSuccess?: () => void }> = ({ onSuccess
                             )}
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
-                            <div className="form-group">
-                                <label className="form-label" style={{ color: 'var(--text-muted)' }}>PROGRAMACIÓN</label>
-                                <input
-                                    type="datetime-local"
-                                    className="form-control"
-                                    required
-                                    value={formData.fecha_hora_ejecucion}
-                                    onChange={(e) => setFormData({ ...formData, fecha_hora_ejecucion: e.target.value })}
-                                />
+                        <div className="responsive-grid-2" style={{ gap: '1rem', marginBottom: '1.25rem' }}>
+                            <div className="form-group" style={{ backgroundColor: '#111', padding: '1rem', border: '1px solid #333', borderRadius: '4px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                                    <label className="form-label" style={{ color: 'var(--text-muted)', margin: 0 }}>PROGRAMACIÓN</label>
+                                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                        <button type="button" onClick={() => setUseExactTime(true)} className={`btn ${useExactTime ? 'btn-primary' : ''}`} style={{ padding: '0.3rem 0.6rem', fontSize: '0.65rem', border: useExactTime ? 'none' : '1px solid #444', background: useExactTime ? 'var(--primary-color)' : '#222', color: 'white' }}>EXACTA</button>
+                                        <button type="button" onClick={() => setUseExactTime(false)} className={`btn ${!useExactTime ? 'btn-primary' : ''}`} style={{ padding: '0.3rem 0.6rem', fontSize: '0.65rem', border: !useExactTime ? 'none' : '1px solid #444', background: !useExactTime ? 'var(--primary-color)' : '#222', color: 'white' }}>RANGO</button>
+                                    </div>
+                                </div>
+                                {useExactTime ? (
+                                    <input
+                                        type="datetime-local"
+                                        className="form-control"
+                                        value={formData.fecha_hora_ejecucion}
+                                        onChange={(e) => setFormData({ ...formData, fecha_hora_ejecucion: e.target.value, rango_horario: '' })}
+                                    />
+                                ) : (
+                                    <select
+                                        className="form-control"
+                                        value={formData.rango_horario}
+                                        onChange={(e) => setFormData({ ...formData, rango_horario: e.target.value, fecha_hora_ejecucion: '' })}
+                                    >
+                                        <option value="">-- SELECCIONE RANGO --</option>
+                                        <option value="MAÑANA">MAÑANA</option>
+                                        <option value="TARDE">TARDE</option>
+                                    </select>
+                                )}
                             </div>
-                            <div className="form-group">
-                                <label className="form-label" style={{ color: 'var(--text-muted)' }}>PRECIO COBRADO</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    placeholder="0"
-                                    required
-                                    value={formData.costo}
-                                    onChange={(e) => setFormData({ ...formData, costo: Number(e.target.value) })}
-                                />
+                            
+                            <div className="form-group" style={{ backgroundColor: '#111', padding: '1rem', border: '1px solid #333', borderRadius: '4px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                                    <label className="form-label" style={{ color: 'var(--text-muted)', margin: 0 }}>PRECIO ACORDADO</label>
+                                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                        <button type="button" onClick={() => setUseExactPrice(true)} className={`btn ${useExactPrice ? 'btn-primary' : ''}`} style={{ padding: '0.3rem 0.6rem', fontSize: '0.65rem', border: useExactPrice ? 'none' : '1px solid #444', background: useExactPrice ? 'var(--primary-color)' : '#222', color: 'white' }}>EXACTO</button>
+                                        <button type="button" onClick={() => setUseExactPrice(false)} className={`btn ${!useExactPrice ? 'btn-primary' : ''}`} style={{ padding: '0.3rem 0.6rem', fontSize: '0.65rem', border: !useExactPrice ? 'none' : '1px solid #444', background: !useExactPrice ? 'var(--primary-color)' : '#222', color: 'white' }}>RANGO</button>
+                                    </div>
+                                </div>
+                                {useExactPrice ? (
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="0"
+                                        value={formData.costo === 0 ? '' : formData.costo}
+                                        onChange={(e) => setFormData({ ...formData, costo: Number(e.target.value), rango_precio: '' })}
+                                    />
+                                ) : (
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Ej: $180.000 a $280.000"
+                                        value={formData.rango_precio}
+                                        onChange={(e) => setFormData({ ...formData, rango_precio: e.target.value, costo: 0 })}
+                                    />
+                                )}
                             </div>
                         </div>
 

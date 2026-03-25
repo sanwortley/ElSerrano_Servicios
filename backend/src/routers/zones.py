@@ -179,3 +179,43 @@ async def reverse_geocode_endpoint(
     if not result:
         raise HTTPException(status_code=404, detail="No se pudo determinar la dirección")
     return result
+
+import httpx
+import re
+
+@router.post("/decode-maps-link")
+async def decode_maps_link_endpoint(
+    data: dict,
+    admin=Depends(get_admin_user)
+):
+    url = data.get("url")
+    if not url:
+         raise HTTPException(status_code=400, detail="Missing URL")
+    
+    try:
+        # Check if already has coords
+        match = re.search(r'@(-?\d+\.\d+),(-?\d+\.\d+)', url)
+        if match:
+             return {"lat": float(match.group(1)), "lng": float(match.group(2))}
+             
+        # Resolve shortlink
+        async with httpx.AsyncClient() as client:
+             res = await client.get(url, follow_redirects=True)
+             final_url = str(res.url)
+             
+             match = re.search(r'@(-?\d+\.\d+),(-?\d+\.\d+)', final_url)
+             if match:
+                 return {"lat": float(match.group(1)), "lng": float(match.group(2))}
+                 
+             # Fallback check query params for ?ll=lat,lng or q=lat,lng
+             match = re.search(r'[?&](q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)', final_url)
+             if match:
+                 return {"lat": float(match.group(2)), "lng": float(match.group(3))}
+                 
+             match = re.search(r'[?&](q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)', url)
+             if match:
+                 return {"lat": float(match.group(2)), "lng": float(match.group(3))}
+                 
+             raise HTTPException(status_code=400, detail="Coordenadas no encontradas en el enlace. Intente pegarlas manualmente.")
+    except Exception as e:
+         raise HTTPException(status_code=400, detail=str(e))

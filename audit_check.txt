@@ -1,0 +1,21 @@
+=== ÚLTIMOS 20 LOGS DE AUDITORÍA ===
+[2026-02-08 20:13:08.875083] User: Rodrigo Petero | Acción: LOGIN | Recurso: auth (ID: 6) | Detalles: None
+[2026-02-08 20:07:14.009278] User: Super Admin | Acción: LOGIN | Recurso: auth (ID: 1) | Detalles: None
+[2026-02-06 18:08:41.774423] User: Super Admin | Acción: REGISTER_PAYMENT | Recurso: pedidos (ID: 1) | Detalles: {'monto': 12000.0, 'metodo': 'EFECTIVO'}
+[2026-02-06 18:05:12.141425] User: Super Admin | Acción: LOGIN | Recurso: auth (ID: 1) | Detalles: None
+[2026-02-06 18:03:45.017862] User: Rodrigo Petero | Acción: START_SHIFT | Recurso: shifts (ID: 1) | Detalles: None
+[2026-02-06 18:03:24.684144] User: Rodrigo Petero | Acción: LOGIN | Recurso: auth (ID: 6) | Detalles: None
+[2026-02-06 18:02:59.433239] User: Rodrigo Petero | Acción: LOGIN | Recurso: auth (ID: 6) | Detalles: None
+[2026-02-06 18:02:57.241954] User: Rodrigo Petero | Acción: LOGIN | Recurso: auth (ID: 6) | Detalles: None
+[2026-02-06 18:01:56.168122] User: Rodrigo Petero | Acción: LOGIN | Recurso: auth (ID: 6) | Detalles: None
+[2026-02-06 17:59:28.247811] User: Super Admin | Acción: UPDATE_STATUS_EN_CAMINO | Recurso: pedidos (ID: 1) | Detalles: None
+[2026-02-06 17:58:11.703216] User: Super Admin | Acción: CREATE_PEDIDO | Recurso: pedidos (ID: 1) | Detalles: None
+[2026-02-06 17:51:38.026273] User: Super Admin | Acción: LOGIN | Recurso: auth (ID: 1) | Detalles: None
+[2026-02-05 12:51:05.028002] User: Super Admin | Acción: LOGIN | Recurso: auth (ID: 1) | Detalles: None
+[2026-02-05 12:42:19.867889] User: Juan Perez | Acción: LOGIN | Recurso: auth (ID: 4) | Detalles: None
+[2026-02-05 12:41:34.836217] User: Super Admin | Acción: UPDATE_STATUS_COMPLETADA | Recurso: pedidos (ID: 2) | Detalles: None
+[2026-02-05 12:41:24.479509] User: Super Admin | Acción: UPDATE_STATUS_EN_CAMINO | Recurso: pedidos (ID: 4) | Detalles: None
+[2026-02-05 12:41:02.700539] User: Super Admin | Acción: LOGIN | Recurso: auth (ID: 1) | Detalles: None
+[2026-02-05 12:40:10.702434] User: Juan Perez | Acción: LOGIN | Recurso: auth (ID: 4) | Detalles: None
+[2026-02-05 12:36:30.476077] User: Super Admin | Acción: LOGIN | Recurso: auth (ID: 1) | Detalles: None
+[2026-02-05 12:29:59.443396] User: Super Admin | Acción: CREATE_PEDIDO | Recurso: pedidos (ID: 5) | Detalles: None

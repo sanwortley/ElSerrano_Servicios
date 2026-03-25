@@ -62,8 +62,12 @@ export const Frecuentes: React.FC = () => {
         fecha_fin: '',
         dia_saliente: '',
         lat: null as number | null,
-        lng: null as number | null
+        lng: null as number | null,
+        rango_horario: '',
+        rango_precio: ''
     });
+
+    const [useExactPrice, setUseExactPrice] = useState(true);
 
     const [allChoferes, setAllChoferes] = useState<any[]>([]);
     const [allClientes, setAllClientes] = useState<any[]>([]);
@@ -253,18 +257,22 @@ export const Frecuentes: React.FC = () => {
                 telefono: formData.telefono,
                 tipo_servicio: formData.tipo_servicio,
                 cantidad: Number(formData.cantidad),
-                costo_individual: Number(formData.costo_individual),
+                costo_individual: formData.rango_precio && !formData.costo_individual ? 0 : Number(formData.costo_individual),
                 fecha_inicio: new Date(formData.fecha_inicio).toISOString(),
                 fecha_fin: formData.fecha_fin ? new Date(formData.fecha_fin).toISOString() : null,
                 dias_semana: detectedZone?.dias_operativos || [],
                 dia_saliente: formData.dia_saliente,
                 lat: formData.lat,
                 lng: formData.lng,
-                zona_id: detectedZone?.id
+                zona_id: detectedZone?.id,
+                rango_horario: formData.rango_horario,
+                rango_precio: formData.rango_precio
             });
 
             alert("Abono creado con éxito!");
             setShowForm(false);
+            setUseExactPrice(true);
+            setFormData(prev => ({ ...prev, rango_horario: '', rango_precio: '' }));
             fetchServices();
         } catch (err: any) {
             console.error("Error creating frequent service:", err);
@@ -362,15 +370,28 @@ export const Frecuentes: React.FC = () => {
                                         <p style={{ margin: 0, color: 'white', fontFamily: 'Anton', fontSize: '1.2rem' }}>{service.cantidad}u.</p>
                                     </div>
                                 </div>
-                                <div style={{ backgroundColor: '#050505', padding: '0.75rem', borderRadius: '2px', border: '1px solid #222' }}>
-                                    <p style={{ fontSize: '0.65rem', color: 'var(--primary-color)', fontWeight: 800, margin: '0 0 0.5rem 0' }}>DÍAS DE SERVICIO</p>
-                                    <p style={{ margin: 0, color: 'white', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.05em' }}>
-                                        {service.dias_semana ? service.dias_semana.join(' • ').toUpperCase() : 'NO DEFINIDO'}
-                                    </p>
-                                    {service.dia_saliente && (
-                                        <p style={{ margin: '0.5rem 0 0 0', color: '#10b981', fontSize: '0.75rem', fontWeight: 800 }}>
-                                            DÍA SALIENTE: {service.dia_saliente.toUpperCase()}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', borderTop: '1px solid #111', paddingTop: '1rem' }}>
+                                    <div style={{ backgroundColor: '#050505', padding: '0.75rem', borderRadius: '2px', border: '1px solid #222' }}>
+                                        <p style={{ fontSize: '0.65rem', color: 'var(--primary-color)', fontWeight: 800, margin: '0 0 0.5rem 0' }}>DÍAS DE SERVICIO</p>
+                                        <p style={{ margin: 0, color: 'white', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.05em' }}>
+                                            {service.dias_semana ? service.dias_semana.join(' • ').toUpperCase() : 'NO DEFINIDO'}
                                         </p>
+                                        {service.dia_saliente && (
+                                            <p style={{ margin: '0.5rem 0 0 0', color: '#10b981', fontSize: '0.75rem', fontWeight: 800 }}>
+                                                DÍA SALIENTE: {service.dia_saliente.toUpperCase()}
+                                            </p>
+                                        )}
+                                        {service.rango_horario && (
+                                            <p style={{ margin: '0.5rem 0 0 0', color: 'var(--primary-color)', fontSize: '0.75rem', fontWeight: 800 }}>
+                                                ⏰ RANGO: {service.rango_horario.toUpperCase()}
+                                            </p>
+                                        )}
+                                    </div>
+                                    {service.rango_precio && (
+                                        <div style={{ backgroundColor: '#050505', padding: '0.75rem', borderRadius: '2px', border: '1px solid #222', textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, margin: 0 }}>PRECIO RANGO</p>
+                                            <p style={{ margin: 0, color: 'white', fontFamily: 'Anton', fontSize: '1.2rem' }}>{service.rango_precio}</p>
+                                        </div>
                                     )}
                                 </div>
 
@@ -579,9 +600,19 @@ export const Frecuentes: React.FC = () => {
                                 <label className="form-label" style={{ color: 'var(--text-muted)' }}>CANTIDAD</label>
                                 <input type="number" name="cantidad" min="1" required onChange={handleInputChange} className="form-control" value={formData.cantidad} />
                             </div>
-                            <div className="form-group">
-                                <label className="form-label" style={{ color: 'var(--text-muted)' }}>COSTO UNITARIO ($)</label>
-                                <input type="number" name="costo_individual" min="0" required onChange={handleInputChange} className="form-control" value={formData.costo_individual} />
+                            <div className="form-group" style={{ backgroundColor: '#111', padding: '1rem', border: '1px solid #333', borderRadius: '4px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                                    <label className="form-label" style={{ color: 'var(--text-muted)', margin: 0 }}>PRECIO UNITARIO</label>
+                                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                        <button type="button" onClick={() => setUseExactPrice(true)} className={`btn ${useExactPrice ? 'btn-primary' : ''}`} style={{ padding: '0.3rem 0.6rem', fontSize: '0.65rem', border: useExactPrice ? 'none' : '1px solid #444', background: useExactPrice ? 'var(--primary-color)' : '#222', color: 'white' }}>EXACTO</button>
+                                        <button type="button" onClick={() => setUseExactPrice(false)} className={`btn ${!useExactPrice ? 'btn-primary' : ''}`} style={{ padding: '0.3rem 0.6rem', fontSize: '0.65rem', border: !useExactPrice ? 'none' : '1px solid #444', background: !useExactPrice ? 'var(--primary-color)' : '#222', color: 'white' }}>RANGO</button>
+                                    </div>
+                                </div>
+                                {useExactPrice ? (
+                                    <input type="number" name="costo_individual" min="0" placeholder="0" required={useExactPrice} onChange={(e) => setFormData(prev => ({...prev, costo_individual: Number(e.target.value), rango_precio: ''}))} className="form-control" value={formData.costo_individual === 0 ? '' : formData.costo_individual} />
+                                ) : (
+                                    <input type="text" name="rango_precio" placeholder="Ej: $180k a $280k" required={!useExactPrice} onChange={(e) => setFormData(prev => ({...prev, rango_precio: e.target.value, costo_individual: 0}))} className="form-control" value={formData.rango_precio} />
+                                )}
                             </div>
                         </div>
                         <div className="responsive-grid-2" style={{ marginBottom: '1.5rem' }}>
@@ -604,6 +635,20 @@ export const Frecuentes: React.FC = () => {
                                 )) : ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map(d => (
                                     <option key={d} value={d}>{d.toUpperCase()}</option>
                                 ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: '3rem' }}>
+                            <label className="form-label" style={{ color: 'var(--text-muted)' }}>RANGO HORARIO OPCIONAL (Ej: MAÑANA)</label>
+                            <select
+                                name="rango_horario"
+                                className="form-control"
+                                value={formData.rango_horario}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">-- SELECCIONE RANGO --</option>
+                                <option value="MAÑANA">MAÑANA</option>
+                                <option value="TARDE">TARDE</option>
                             </select>
                         </div>
 

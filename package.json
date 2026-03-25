@@ -1,0 +1,15 @@
+{
+  "name": "el-serrano-servicios-root",
+  "version": "1.0.0",
+  "description": "Root configuration for El Serrano Servicios",
+  "private": true,
+  "scripts": {
+    "dev": "npx concurrently \"npm run dev-backend\" \"npm run dev-frontend\"",
+    "dev-backend": "powershell -Command \"$env:PYTHONPATH='backend'; python -u -m src.main\"",
+    "dev-frontend": "npm --prefix frontend run dev",
+    "install-all": "npm install && npm --prefix frontend install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -42,6 +42,9 @@ class PedidoIndividual(Base):
     chofer_id: Mapped[Optional[int]] = mapped_column(ForeignKey("choferes.id"), nullable=True)
     orden_en_ruta: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     
+    rango_horario: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    rango_precio: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    
     creado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
     actualizado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg, onupdate=get_now_arg)
     
@@ -82,6 +85,9 @@ class ServicioFrecuente(Base):
     chofer_id: Mapped[Optional[int]] = mapped_column(ForeignKey("choferes.id"), nullable=True)
     estado: Mapped[EstadoFrecuente] = mapped_column(Enum(EstadoFrecuente, native_enum=False), default=EstadoFrecuente.ACTIVO)
     orden_en_ruta: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    
+    rango_horario: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    rango_precio: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     
     creado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg)
     actualizado_en: Mapped[datetime] = mapped_column(DateTime, default=get_now_arg, onupdate=get_now_arg)

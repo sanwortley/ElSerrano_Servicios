@@ -22,6 +22,7 @@ export interface RouteMapItem {
     cliente: string;
     direccion: string;
     tipo?: string;
+    displayIndex?: number;
 }
 
 interface RouteMapProps {
@@ -163,7 +164,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({ items, height = '400px' }) =
                     <Marker 
                         key={`${item.id}-${index}`} 
                         position={[item.lat!, item.lng!]}
-                        icon={createNumberedIcon(index + 1)}
+                        icon={createNumberedIcon(item.displayIndex !== undefined ? item.displayIndex : index + 1)}
                     >
                         <Popup>
                             <div style={{ color: '#000' }}>

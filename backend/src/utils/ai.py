@@ -31,12 +31,18 @@ def parse_order_text(text: str):
         Extrae datos de este mensaje:
         {text}
         
-        JSON:
+        Si el cliente indica un rango de horario (ej: "por la mañana", "tarde", "noche"), extraelo en 'horario_rango'. NO uses un horario fijo si es un rango.
+        Si el cliente indica un rango de precio o monto (ej: "$180000 a $280000", dependiendo del tiempo o trabajo), extraelo en 'precio_rango'.
+        Si el cliente menciona un barrio cerrado, country o número de lote (ej: "portería los milagros", "Lote 34"), ES VITAL que lo incluyas tal cual en la 'direccion'.
+
+        Devuelve unicamente un JSON con estos campos:
         - nombre
         - telefono
         - direccion
         - tipo_servicio: ("Volquetes y contenedores para obra", "Venta de áridos, piedras y rellenos", "Desagotes y destapes de cañerías", "Alquiler de baños químicos", "Movimiento de suelo", "Alquiler de obradores", "Otros")
         - descripcion
+        - horario_rango
+        - precio_rango
         """
         
         response = model.generate_content(prompt)

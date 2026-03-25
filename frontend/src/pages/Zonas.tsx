@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Map, Save, Search, Plus, Trash2, X, MapPin } from 'lucide-react';
 import api from '../api/axios';
+import { MapPicker } from '../components/MapPicker';
 
 interface Zona {
     id: number;
@@ -25,12 +26,19 @@ export const Zonas: React.FC = () => {
 
     // New Zone Form
     const [showNewForm, setShowNewForm] = useState(false);
+    const [showMapPicker, setShowMapPicker] = useState(false);
     const [newZoneName, setNewZoneName] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocalidades, setSelectedLocalidades] = useState<Localidad[]>([]);
     const [searching, setSearching] = useState(false);
     const [searchResult, setSearchResult] = useState<Localidad | null>(null);
     const [error, setError] = useState('');
+    
+    // Manual Coords/Links
+    const [linkInput, setLinkInput] = useState('');
+    const [latInput, setLatInput] = useState('');
+    const [lngInput, setLngInput] = useState('');
+    const [processingLink, setProcessingLink] = useState(false);
 
     const fetchZonas = async () => {
         try {
@@ -79,6 +87,42 @@ export const Zonas: React.FC = () => {
 
     const removeLocalidad = (index: number) => {
         setSelectedLocalidades(selectedLocalidades.filter((_, i) => i !== index));
+    };
+
+    const handleAddManualCoords = (latStr: string, lngStr: string, source: string = 'COORDENADAS MANUALES') => {
+        const lat = parseFloat(latStr);
+        const lng = parseFloat(lngStr);
+        if (isNaN(lat) || isNaN(lng)) {
+            alert("Coordenadas inválidas");
+            return;
+        }
+        if (selectedLocalidades.length >= 10) {
+            alert("Máximo 10 localidades por zona.");
+            return;
+        }
+        setSelectedLocalidades([...selectedLocalidades, {
+            display_name: source,
+            type: 'Point',
+            geojson: { type: 'Point', coordinates: [lng, lat] }
+        }]);
+        setLatInput('');
+        setLngInput('');
+        setLinkInput('');
+    };
+
+    const handleProcessLink = async () => {
+        if (!linkInput) return;
+        setProcessingLink(true);
+        setError('');
+        try {
+            const res = await api.post('/zonas/decode-maps-link', { url: linkInput });
+            const { lat, lng } = res.data;
+            handleAddManualCoords(lat.toString(), lng.toString(), 'ENLACE GOOGLE MAPS');
+        } catch (err: any) {
+            setError(err.response?.data?.detail || "Error al procesar el enlace");
+        } finally {
+            setProcessingLink(false);
+        }
     };
 
     const handleCreateZone = async () => {
@@ -199,8 +243,8 @@ export const Zonas: React.FC = () => {
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 800 }}>AGREGAR LOCALIDAD</label>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 800 }}>AGREGAR LOCALIDAD O PUNTO MANUAL</label>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                                     <input
                                         className="form-control"
                                         placeholder="Buscar ciudad o pueblo (Ej: Villa General Belgrano)"
@@ -208,12 +252,73 @@ export const Zonas: React.FC = () => {
                                         onChange={e => setSearchTerm(e.target.value)}
                                         onKeyPress={e => e.key === 'Enter' && handleSearchLocality()}
                                     />
-                                    <button className="btn btn-primary" onClick={handleSearchLocality} disabled={searching}>
+                                    <button className="btn btn-primary" onClick={handleSearchLocality} disabled={searching} title="Buscar en Base de Datos">
                                         <Search size={20} />
                                     </button>
                                 </div>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button className="btn btn-secondary btn-block" onClick={() => setShowMapPicker(true)} style={{ background: '#222', border: '1px dashed #555' }}>
+                                        <MapPin size={18} /> SELECCIONAR BARRIO/LOTE EN MAPA
+                                    </button>
+                                </div>
+                                
+                                <div style={{ borderTop: '1px dashed #333', marginTop: '1.5rem', paddingTop: '1.5rem' }}>
+                                    <label className="form-label" style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 800 }}>VÍAS ALTERNATIVAS (MODO EXPERTO)</label>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <input
+                                                className="form-control"
+                                                placeholder="Pegar enlace de Google Maps o WhatsApp..."
+                                                value={linkInput}
+                                                onChange={e => setLinkInput(e.target.value)}
+                                            />
+                                            <button className="btn btn-primary" onClick={handleProcessLink} disabled={!linkInput || processingLink} title="Extraer Coordenadas del Enlace">
+                                                {processingLink ? '...' : 'OK'}
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                            <input
+                                                className="form-control"
+                                                type="number" step="any"
+                                                placeholder="Latitud (Ej: -32.123)"
+                                                value={latInput}
+                                                onChange={e => setLatInput(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control"
+                                                type="number" step="any"
+                                                placeholder="Longitud (Ej: -64.456)"
+                                                value={lngInput}
+                                                onChange={e => setLngInput(e.target.value)}
+                                            />
+                                            <button className="btn btn-secondary" onClick={() => handleAddManualCoords(latInput, lngInput)} disabled={!latInput || !lngInput} style={{ background: '#222' }}>
+                                                AÑADIR P. DIRECTO
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                                 {error && <p style={{ color: 'var(--danger-color)', fontSize: '0.7rem', marginTop: '0.5rem', fontWeight: 800 }}>{error.toUpperCase()}</p>}
                             </div>
+
+                            {showMapPicker && (
+                                <div style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)' }}>
+                                    <MapPicker
+                                        onClose={() => setShowMapPicker(false)}
+                                        onSelect={(lat, lng) => {
+                                            if (selectedLocalidades.length >= 10) {
+                                                alert("Máximo 10 localidades por zona.");
+                                                return;
+                                            }
+                                            setSelectedLocalidades([...selectedLocalidades, {
+                                                display_name: 'PUNTO MANUAL (BARRIO PRIVADO/LOTE)',
+                                                type: 'Point',
+                                                geojson: { type: 'Point', coordinates: [lng, lat] }
+                                            }]);
+                                            setShowMapPicker(false);
+                                        }}
+                                    />
+                                </div>
+                            )}
 
                             {searchResult && (
                                 <div style={{ marginTop: '1.5rem', padding: '1.5rem', background: '#111', border: '1px solid var(--primary-color)', borderRadius: '2px' }}>

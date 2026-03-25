@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Study: El Serrano</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --surface: #121216;
+            --primary: #10b981;
+            --text: #f3f4f6;
+            --text-dim: #9ca3af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1f;
+            /* Gray background outside the page */
+            display: flex;
+            justify-content: center;
+            padding: 40px 0;
+        }
+
+        /* The Paper Sheet */
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40mm 25mm;
+            /* Large margins for professional look */
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #fff;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-dim);
+            font-weight: 300;
+            margin-bottom: 25px;
+        }
+
+        .banner {
+            width: 100%;
+            height: 80mm;
+            /* Fixed height to prevent overflow */
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        p {
+            color: var(--text-dim);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .feature-item {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            font-size: 12px;
+        }
+
+        .feature-item span {
+            color: var(--primary);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .tech-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 11px;
+            opacity: 0.6;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+                background: none;
+            }
+
+            .page {
+                box-shadow: none;
+                margin: 0;
+                width: 210mm;
+                height: 297mm;
+            }
+
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+        <header>
+            <span class="tag">Full-Stack Development</span>
+            <h1>Logistics & Fleet<br>Management System</h1>
+            <p class="subtitle">FastAPI + React High-Performance Operational Ecosystem</p>
+        </header>
+
+        <img src="banner.png" alt="System Preview" class="banner">
+
+        <div class="section-title">Project Overview</div>
+        <div class="grid">
+            <div>
+                <h2>The Challenge</h2>
+                <p>Automating traditional logistics for field services. Built a real-time coordination system that
+                    eliminates manual errors and optimizes fleet movement.</p>
+            </div>
+            <div>
+                <h2>The Solution</h2>
+                <p>Developed a secure, scalable platform with a unified dashboard for drivers and admin, featuring
+                    geo-fencing and automated task assignment.</p>
+            </div>
+        </div>
+
+        <div class="section-title">Technical Excellence</div>
+        <div class="grid">
+            <div>
+                <h2>Advanced Geolocation</h2>
+                <div class="feature-item"><span>✦</span>
+                    <p>Nominatim-based zone detection.</p>
+                </div>
+                <div class="feature-item"><span>✦</span>
+                    <p>Polygon geofencing for pricing.</p>
+                </div>
+                <div class="feature-item"><span>✦</span>
+                    <p>Route clustering for drivers.</p>
+                </div>
+            </div>
+            <div>
+                <h2>Security & Core</h2>
+                <div class="feature-item"><span>✦</span>
+                    <p>State-of-the-art JWT auth.</p>
+                </div>
+                <div class="feature-item"><span>✦</span>
+                    <p>Action Audit logging for traceability.</p>
+                </div>
+                <div class="feature-item"><span>✦</span>
+                    <p>PostgreSQL / PostGIS integration.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Core Technology Stack</div>
+        <ul class="tech-list">
+            <li class="tech-item">FastAPI</li>
+            <li class="tech-item">React</li>
+            <li class="tech-item">TypeScript</li>
+            <li class="tech-item">SQLAlchemy</li>
+            <li class="tech-item">PostgreSQL</li>
+            <li class="tech-item">Docker</li>
+            <li class="tech-item">PostGIS</li>
+        </ul>
+
+        <footer>
+            Built with Secure Development Principles. Let's build your next project together.
+        </footer>
+    </div>
+
+</body>
+
+</html>
