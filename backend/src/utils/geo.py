@@ -7,7 +7,7 @@ from sqlalchemy import select
 try:
     from shapely.geometry import shape, Point
     SHAPELY_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError, Exception):
     print("Warning: shapely or libgeos not found. Custom zone detection fallback will be disabled.")
     SHAPELY_AVAILABLE = False
 from src.config import settings
