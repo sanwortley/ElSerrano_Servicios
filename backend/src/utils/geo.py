@@ -1,11 +1,15 @@
-
 import json
 import hashlib
 import httpx
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from shapely.geometry import shape, Point
+try:
+    from shapely.geometry import shape, Point
+    SHAPELY_AVAILABLE = True
+except ImportError:
+    print("Warning: shapely or libgeos not found. Custom zone detection fallback will be disabled.")
+    SHAPELY_AVAILABLE = False
 from src.config import settings
 from src.models.geo import GeocodeCache, Zona
 
@@ -88,49 +92,33 @@ async def get_lat_lng(address: str, db: AsyncSession):
             url = "https://nominatim.openstreetmap.org/search"
             headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
             
-            # Build a cleaner query
+            # ... (build query)
             clean_query = address
-            if "córdoba" not in clean_query.lower():
-                clean_query += ", Córdoba"
-            if "argentina" not in clean_query.lower():
-                clean_query += ", Argentina"
+            if "córdoba" not in clean_query.lower(): clean_query += ", Córdoba"
+            if "argentina" not in clean_query.lower(): clean_query += ", Argentina"
 
-            # Use viewbox to bias results towards the operative region (Calamuchita/Córdoba)
-            params = {
-                "q": clean_query,
-                "format": "json",
-                "limit": 10,
-                "viewbox": "-65.0,-32.5,-63.0,-30.5",
-                "bounded": 0
-            }
+            params = { "q": clean_query, "format": "json", "limit": 10, "viewbox": "-65.0,-32.5,-63.0,-30.5", "bounded": 0 }
             response = await client.get(url, params=params, headers=headers)
             data = response.json()
             
             if data and len(data) > 0:
-                # Try to find the best candidate that falls inside a zone
-                stmt = select(Zona).where(Zona.activo == True)
-                res = await db.execute(stmt)
-                zones = res.scalars().all()
-                zone_shapes = []
-                for z in zones:
-                    try: zone_shapes.append(shape(json.loads(z.polygon_geojson)))
-                    except: continue
+                selected_candidate = data[0]
+                if SHAPELY_AVAILABLE:
+                    # Try to find the best candidate that falls inside a zone
+                    stmt = select(Zona).where(Zona.activo == True)
+                    res = await db.execute(stmt)
+                    zones = res.scalars().all()
+                    zone_shapes = []
+                    for z in zones:
+                        try: zone_shapes.append(shape(json.loads(z.polygon_geojson)))
+                        except: continue
 
-                selected_candidate = data[0] # Fallback to first if none in zone
-                for item in data:
-                    c_lat = float(item["lat"])
-                    c_lng = float(item["lon"])
-                    c_point = Point(c_lng, c_lat)
-                    
-                    found_in_zone = False
-                    for s in zone_shapes:
-                        if s.buffer(0.0001).contains(c_point):
-                            found_in_zone = True
+                    for item in data:
+                        c_lat, c_lng = float(item["lat"]), float(item["lon"])
+                        c_point = Point(c_lng, c_lat)
+                        if any(s.buffer(0.0001).contains(c_point) for s in zone_shapes):
+                            selected_candidate = item
                             break
-                    
-                    if found_in_zone:
-                        selected_candidate = item
-                        break
 
                 lat = float(selected_candidate["lat"])
                 lng = float(selected_candidate["lon"])
@@ -311,72 +299,60 @@ async def search_addresses(query: str, db: AsyncSession):
             url = "https://nominatim.openstreetmap.org/search"
             headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
             
-            params = {
-                "q": query,
-                "format": "json",
-                "limit": 40,
-                "addressdetails": 1,
-                "viewbox": "-65.0,-32.5,-63.0,-30.5", 
-                "bounded": 0 
-            }
-            if "córdoba" not in query.lower():
-                params["q"] += ", Córdoba, Argentina"
+            params = { "q": query, "format": "json", "limit": 40, "addressdetails": 1, "viewbox": "-65.0,-32.5,-63.0,-30.5", "bounded": 0 }
+            if "córdoba" not in query.lower(): params["q"] += ", Córdoba, Argentina"
 
             response = await client.get(url, params=params, headers=headers)
             data = response.json()
             
-            # ... (Rest of Nominatim filtering logic)
-            stmt = select(Zona).where(Zona.activo == True)
-            res_zones = await db.execute(stmt)
-            zones = res_zones.scalars().all()
-            
-            zone_shapes = []
-            for z in zones:
-                try: zone_shapes.append((z, shape(json.loads(z.polygon_geojson))))
-                except: continue
-
             suggestions = []
-            import re
-            query_number = None
-            num_match = re.search(r'\b(\d+)\b', query)
-            if num_match: query_number = num_match.group(1)
+            if SHAPELY_AVAILABLE:
+                # ... (Rest of Nominatim filtering logic with shapely)
+                stmt = select(Zona).where(Zona.activo == True)
+                res_zones = await db.execute(stmt)
+                zones = res_zones.scalars().all()
+                
+                zone_shapes = []
+                for z in zones:
+                    try: zone_shapes.append((z, shape(json.loads(z.polygon_geojson))))
+                    except: continue
 
-            # Custom Zonas check (already in original code)
-            query_norm = query.lower().replace("barrio", "").replace("privado", "").replace("lote", "").replace("country", "").replace(",", "").strip()
-            query_norm_text = ' '.join([w for w in query_norm.split() if not w.isnumeric()])
-            if len(query_norm_text) > 3:
-                for z, s in zone_shapes:
-                    z_norm = z.nombre.lower().replace("barrio", "").replace("privado", "").replace("country", "").strip()
-                    if len(z_norm) > 3 and z_norm in query_norm_text:
-                        centroid = s.centroid
-                        display_name = f"{z.nombre}"
-                        if query_number: display_name = f"Lote {query_number}, {z.nombre}"
-                        suggestions.append({
-                            "display_name": f"{display_name} (Barrio Privado)",
-                            "lat": centroid.y,
-                            "lng": centroid.x,
-                            "city": "ZONA EL SERRANO"
-                        })
+                import re
+                query_number = None
+                num_match = re.search(r'\b(\d+)\b', query)
+                if num_match: query_number = num_match.group(1)
 
-            for item in data:
-                lat, lng = float(item["lat"]), float(item["lon"])
-                point = Point(lng, lat)
-                is_inside = any(s.buffer(0.0001).contains(point) for z, s in zone_shapes)
-                if not is_inside: continue
+                # Custom Zonas check
+                query_norm = query.lower().replace("barrio", "").replace("privado", "").replace("lote", "").replace("country", "").replace(",", "").strip()
+                query_norm_text = ' '.join([w for w in query_norm.split() if not w.isnumeric()])
+                if len(query_norm_text) > 3:
+                    for z, s in zone_shapes:
+                        z_norm = z.nombre.lower().replace("barrio", "").replace("privado", "").replace("country", "").strip()
+                        if len(z_norm) > 3 and z_norm in query_norm_text:
+                            centroid = s.centroid
+                            display_name = f"{z.nombre}"
+                            if query_number: display_name = f"Lote {query_number}, {z.nombre}"
+                            suggestions.append({
+                                "display_name": f"{display_name} (Barrio Privado)",
+                                "lat": centroid.y, "lng": centroid.x, "city": "ZONA EL SERRANO"
+                            })
 
-                addr = item.get("address", {})
-                display_name = item["display_name"]
-                if query_number and not addr.get("house_number"):
-                    road = addr.get("road") or addr.get("pedestrian")
-                    if road and road.lower() in display_name.lower() and query_number not in display_name:
-                        display_name = f"{road} {query_number}, {display_name.split(road, 1)[-1].strip(', ')}"
-
-                suggestions.append({
-                    "display_name": display_name,
-                    "lat": lat,
-                    "lng": lng,
-                    "city": addr.get("city") or addr.get("town") or addr.get("village") or addr.get("suburb") or addr.get("neighbourhood")
-                })
+                for item in data:
+                    lat, lng = float(item["lat"]), float(item["lon"])
+                    point = Point(lng, lat)
+                    if any(s.buffer(0.0001).contains(point) for z, s in zone_shapes):
+                        addr = item.get("address", {})
+                        display_name = item["display_name"]
+                        suggestions.append({ "display_name": display_name, "lat": lat, "lng": lng, "city": addr.get("city") or addr.get("town") or "Córdoba" })
+            else:
+                # Simple fallback if shapely is missing
+                for item in data[:10]:
+                    addr = item.get("address", {})
+                    suggestions.append({ 
+                        "display_name": item["display_name"], 
+                        "lat": float(item["lat"]), "lng": float(item["lon"]), 
+                        "city": addr.get("city") or addr.get("town") or "Córdoba" 
+                    })
             return suggestions
         except Exception as e:
             print(f"Error searching addresses for {query}: {e}")
