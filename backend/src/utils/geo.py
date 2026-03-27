@@ -48,9 +48,43 @@ async def get_lat_lng(address: str, db: AsyncSession):
                 except Exception as e:
                     pass
 
-    # Fetch from Nominatim
+    # Fetch from Google Maps or Nominatim
     async with httpx.AsyncClient() as client:
         try:
+            if settings.GOOGLE_MAPS_API_KEY:
+                # GOOGLE MAPS GEOCODING
+                url = "https://maps.googleapis.com/maps/api/geocode/json"
+                params = {
+                    "address": address,
+                    "key": settings.GOOGLE_MAPS_API_KEY,
+                    "region": "ar",
+                    "language": "es"
+                }
+                # Add location bias for Cordoba/Calamuchita
+                params["location"] = "-32.1,-64.5"
+                params["radius"] = "80000" # 80km
+
+                response = await client.get(url, params=params)
+                data = response.json()
+                
+                if data.get("status") == "OK" and data.get("results"):
+                    selected_candidate = data["results"][0]
+                    lat = selected_candidate["geometry"]["location"]["lat"]
+                    lng = selected_candidate["geometry"]["location"]["lng"]
+                    
+                    # Save to cache
+                    new_cache = GeocodeCache(
+                        query_hash=query_hash,
+                        direccion_normalizada=address_norm,
+                        lat=lat,
+                        lng=lng,
+                        raw_json=selected_candidate
+                    )
+                    db.add(new_cache)
+                    await db.commit()
+                    return lat, lng
+            
+            # FALLBACK TO NOMINATIM
             url = "https://nominatim.openstreetmap.org/search"
             headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
             
@@ -65,7 +99,7 @@ async def get_lat_lng(address: str, db: AsyncSession):
             params = {
                 "q": clean_query,
                 "format": "json",
-                "limit": 10, # Get more results to find one in-zone
+                "limit": 10,
                 "viewbox": "-65.0,-32.5,-63.0,-30.5",
                 "bounded": 0
             }
@@ -116,7 +150,6 @@ async def get_lat_lng(address: str, db: AsyncSession):
         except Exception as e:
             print(f"Geocoding error for {address}: {e}")
             return None, None
-            
     return None, None
 
 
@@ -233,13 +266,55 @@ async def search_addresses(query: str, db: AsyncSession):
     """
     async with httpx.AsyncClient() as client:
         try:
+            # 1. OPTIONAL GOOGLE PLACES AUTOCOMPLETE
+            if settings.GOOGLE_MAPS_API_KEY:
+                url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
+                params = {
+                    "input": query,
+                    "key": settings.GOOGLE_MAPS_API_KEY,
+                    "location": "-32.1,-64.5", # Calamuchita bias
+                    "radius": "80000",
+                    "components": "country:ar",
+                    "language": "es"
+                }
+                response = await client.get(url, params=params)
+                data = response.json()
+                
+                if data.get("status") == "OK":
+                    google_suggestions = []
+                    for p in data["predictions"]:
+                        # For each prediction, we need to geocode it to get Lat/Lng
+                        # In a real app we might defer this until selection, but the current UI expects it.
+                        google_suggestions.append({
+                            "display_name": p["description"],
+                            "place_id": p["place_id"],
+                            "city": next((t for t in p.get("terms", []) if "Cordoba" in t.get("value", "")), "Córdoba"),
+                            "is_google": True
+                        })
+                    
+                    # Resolve Lat/Lng for Google suggestions (limited to first 5 for speed)
+                    final_google = []
+                    for gs in google_suggestions[:5]:
+                        g_url = "https://maps.googleapis.com/maps/api/geocode/json"
+                        g_res = await client.get(g_url, params={"place_id": gs["place_id"], "key": settings.GOOGLE_MAPS_API_KEY})
+                        g_data = g_res.json()
+                        if g_data.get("status") == "OK":
+                            loc = g_data["results"][0]["geometry"]["location"]
+                            gs["lat"] = loc["lat"]
+                            gs["lng"] = loc["lng"]
+                            final_google.append(gs)
+                    
+                    if final_google:
+                        return final_google
+
+            # 2. NOMINATIM FALLBACK
             url = "https://nominatim.openstreetmap.org/search"
             headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
             
             params = {
                 "q": query,
                 "format": "json",
-                "limit": 40, # High limit because we filter heavily
+                "limit": 40,
                 "addressdetails": 1,
                 "viewbox": "-65.0,-32.5,-63.0,-30.5", 
                 "bounded": 0 
@@ -250,37 +325,32 @@ async def search_addresses(query: str, db: AsyncSession):
             response = await client.get(url, params=params, headers=headers)
             data = response.json()
             
-            # Get all active zones from DB
+            # ... (Rest of Nominatim filtering logic)
             stmt = select(Zona).where(Zona.activo == True)
             res_zones = await db.execute(stmt)
             zones = res_zones.scalars().all()
             
             zone_shapes = []
             for z in zones:
-                try:
-                    zone_shapes.append((z, shape(json.loads(z.polygon_geojson))))
-                except:
-                    continue
+                try: zone_shapes.append((z, shape(json.loads(z.polygon_geojson))))
+                except: continue
 
             suggestions = []
             import re
             query_number = None
             num_match = re.search(r'\b(\d+)\b', query)
-            if num_match:
-                query_number = num_match.group(1)
+            if num_match: query_number = num_match.group(1)
 
-            # Custom Zonas check: if the query matches a Zona name, add its centroid
+            # Custom Zonas check (already in original code)
             query_norm = query.lower().replace("barrio", "").replace("privado", "").replace("lote", "").replace("country", "").replace(",", "").strip()
             query_norm_text = ' '.join([w for w in query_norm.split() if not w.isnumeric()])
-
             if len(query_norm_text) > 3:
                 for z, s in zone_shapes:
                     z_norm = z.nombre.lower().replace("barrio", "").replace("privado", "").replace("country", "").strip()
                     if len(z_norm) > 3 and z_norm in query_norm_text:
                         centroid = s.centroid
                         display_name = f"{z.nombre}"
-                        if query_number:
-                            display_name = f"Lote {query_number}, {z.nombre}"
+                        if query_number: display_name = f"Lote {query_number}, {z.nombre}"
                         suggestions.append({
                             "display_name": f"{display_name} (Barrio Privado)",
                             "lat": centroid.y,
@@ -289,26 +359,15 @@ async def search_addresses(query: str, db: AsyncSession):
                         })
 
             for item in data:
-                lat = float(item["lat"])
-                lng = float(item["lon"])
+                lat, lng = float(item["lat"]), float(item["lon"])
                 point = Point(lng, lat)
-                
-                # Check if point is inside ANY of our zones (with buffer)
-                is_inside = False
-                for z, s in zone_shapes:
-                    if s.buffer(0.0001).contains(point): # 10m buffer for suggestions
-                        is_inside = True
-                        break
-                
-                if not is_inside:
-                    continue # Filter out locations outside zones
+                is_inside = any(s.buffer(0.0001).contains(point) for z, s in zone_shapes)
+                if not is_inside: continue
 
                 addr = item.get("address", {})
-                house_number = addr.get("house_number")
-                road = addr.get("road") or addr.get("pedestrian") or addr.get("cycleway") or addr.get("path")
-                
                 display_name = item["display_name"]
-                if query_number and not house_number:
+                if query_number and not addr.get("house_number"):
+                    road = addr.get("road") or addr.get("pedestrian")
                     if road and road.lower() in display_name.lower() and query_number not in display_name:
                         display_name = f"{road} {query_number}, {display_name.split(road, 1)[-1].strip(', ')}"
 
@@ -322,7 +381,6 @@ async def search_addresses(query: str, db: AsyncSession):
         except Exception as e:
             print(f"Error searching addresses for {query}: {e}")
             return []
-            
     return []
 async def reverse_geocode(lat: float, lng: float):
     """
@@ -330,6 +388,23 @@ async def reverse_geocode(lat: float, lng: float):
     """
     async with httpx.AsyncClient() as client:
         try:
+            if settings.GOOGLE_MAPS_API_KEY:
+                url = "https://maps.googleapis.com/maps/api/geocode/json"
+                params = {
+                    "latlng": f"{lat},{lng}",
+                    "key": settings.GOOGLE_MAPS_API_KEY,
+                    "language": "es"
+                }
+                response = await client.get(url, params=params)
+                data = response.json()
+                if data.get("status") == "OK" and data.get("results"):
+                    best = data["results"][0]
+                    return {
+                        "display_name": best["formatted_address"],
+                        "address": { "full": best["formatted_address"] } # Simplified structure
+                    }
+
+            # NOMINATIM FALLBACK
             url = "https://nominatim.openstreetmap.org/reverse"
             headers = {"User-Agent": settings.NOMINATIM_USER_AGENT or "ElSerrano-App"}
             params = {

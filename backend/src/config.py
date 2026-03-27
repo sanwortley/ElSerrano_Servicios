@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     
     NOMINATIM_USER_AGENT: str = "volquetes-gestion-app"
     GEMINI_API_KEY: str | None = None
+    GOOGLE_MAPS_API_KEY: str | None = None
     
     @model_validator(mode='before')
     @classmethod
